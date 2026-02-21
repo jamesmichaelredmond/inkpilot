@@ -99,6 +99,9 @@ ${sizeGuide}
    - Would it be clear at 16px?
    - Does the silhouette read well?
 
+### After presenting the design
+Tell the user you can try alternative approaches — a different metaphor, style (outline vs filled vs duotone), or level of detail — if they'd like to see other options.
+
 ### What NOT to do
 - Don't mix stroke-based and fill-based elements in the same icon (pick one style)
 - Don't use text elements in icons (they won't render at small sizes)

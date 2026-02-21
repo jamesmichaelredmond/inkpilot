@@ -114,6 +114,9 @@ ${shapeGuide}
    - Is there hierarchy between title and subtitle?
    - Does it look like an official seal, not a sticker?
 
+### After presenting the design
+Tell the user you can explore alternative directions — a different shape, color palette, or decorative style — if they'd like to see other options.
+
 ### What NOT to do
 - Don't use more than 3 decorative elements (stars, dots, etc.) — restraint is premium
 - Don't make text too small — it must be readable when the badge is displayed at 100px

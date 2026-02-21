@@ -130,6 +130,9 @@ SVG has no native button — you build them from a rounded rect + centered text.
    - Does the overall composition feel balanced (not lopsided)?
    - Are the colors cohesive?
 
+### After presenting the design
+Tell the user you can explore alternative directions — a different layout, color scheme, or background style — if they'd like to see other options.
+
 ### What NOT to do
 - Don't make the subheading compete with the heading for attention
 - Don't use more than 2 font sizes (heading + subheading)

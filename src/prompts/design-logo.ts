@@ -101,6 +101,9 @@ Before writing any SVG, decide on:
   - Is there breathing room (whitespace) around all elements?
 - Fix any issues found, then screenshot again
 
+## After presenting the design
+Tell the user you can explore alternative directions — a different symbol concept, color palette, or typographic style — if they'd like to see other options.
+
 ## What NOT to do
 - Don't use more than 2-3 colors
 - Don't use more than 1 typeface
