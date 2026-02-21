@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import fs from "fs";
+import os from "os";
 import path from "path";
 import { SvgDocument } from "./svg-document";
 import { SvgEditorProvider } from "./webview-provider";
@@ -7,6 +8,40 @@ import { createMcpApp } from "./mcp-server";
 import type { Server as HttpServer } from "http";
 
 let httpServer: HttpServer | null = null;
+
+// ── Claude Code MCP auto-registration ──
+
+const CLAUDE_CONFIG = path.join(os.homedir(), ".claude.json");
+
+function registerWithClaudeCode(port: number) {
+    try {
+        if (!fs.existsSync(CLAUDE_CONFIG)) return;
+        const raw = fs.readFileSync(CLAUDE_CONFIG, "utf-8");
+        const config = JSON.parse(raw);
+        if (!config.mcpServers) config.mcpServers = {};
+        config.mcpServers.mcpsvg = {
+            type: "sse",
+            url: `http://localhost:${port}/sse`,
+        };
+        fs.writeFileSync(CLAUDE_CONFIG, JSON.stringify(config, null, 2), "utf-8");
+    } catch {
+        // Claude Code not installed or config unreadable — skip silently
+    }
+}
+
+function unregisterFromClaudeCode() {
+    try {
+        if (!fs.existsSync(CLAUDE_CONFIG)) return;
+        const raw = fs.readFileSync(CLAUDE_CONFIG, "utf-8");
+        const config = JSON.parse(raw);
+        if (config.mcpServers?.mcpsvg) {
+            delete config.mcpServers.mcpsvg;
+            fs.writeFileSync(CLAUDE_CONFIG, JSON.stringify(config, null, 2), "utf-8");
+        }
+    } catch {
+        // Best-effort cleanup
+    }
+}
 
 export function activate(context: vscode.ExtensionContext) {
     // Singleton SvgDocument for the manual panel (MCP create-from-scratch)
@@ -158,6 +193,9 @@ export function activate(context: vscode.ExtensionContext) {
             ],
         })
     );
+
+    // ── Register with Claude Code ──
+    registerWithClaudeCode(port);
 }
 
 function writeProject(svgDoc: SvgDocument, filePath: string) {
@@ -218,4 +256,5 @@ export function deactivate() {
         httpServer.close();
         httpServer = null;
     }
+    unregisterFromClaudeCode();
 }

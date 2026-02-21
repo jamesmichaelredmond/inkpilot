@@ -2,7 +2,7 @@
     "name": "mcpsvg",
     "displayName": "mcpsvg",
     "description": "AI-Powered SVG Editor for VSCode via MCP",
-    "version": "0.1.0",
+    "version": "0.3.0",
     "publisher": "mcpsvg",
     "license": "MIT",
     "repository": {
@@ -10,7 +10,7 @@
         "url": "https://github.com/mcpsvg/mcpsvg"
     },
     "engines": {
-        "vscode": "^1.99.0"
+        "vscode": "^1.109.0"
     },
     "categories": [
         "Visualization",
