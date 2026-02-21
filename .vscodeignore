@@ -1,0 +1,7 @@
+.github/
+src/
+*.ts
+tsconfig.json
+esbuild.config.mjs
+.gitignore
+.vscode-test/
