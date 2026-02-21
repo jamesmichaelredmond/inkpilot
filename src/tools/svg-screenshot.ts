@@ -8,7 +8,16 @@ export function registerSvgScreenshot(
 ) {
     server.tool(
         "svg_screenshot",
-        "Render the current SVG to a PNG image and return it as base64. Useful for visual feedback.",
+        `Render the current SVG to a PNG image and return it as base64. Use this for visual feedback and quality review.
+
+IMPORTANT: Call this after every major design step to verify your work visually. Check for:
+- Text readability and alignment
+- Color contrast and visual harmony
+- Proper spacing and whitespace
+- Elements not clipped or overflowing the canvas
+- Overall visual balance and professionalism
+
+If something looks wrong, use svg_set to fix it, then screenshot again.`,
         {},
         async () => {
             const svg = context.svgDocument.getSvg();

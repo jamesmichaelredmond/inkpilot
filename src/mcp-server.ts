@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import express from "express";
 import type { SvgDocument } from "./svg-document";
+import { registerAllResources } from "./resources";
 import { registerAllTools } from "./tools";
 
 export interface McpServerContext {
@@ -20,10 +21,11 @@ export function createMcpApp(context: McpServerContext) {
         // Each SSE connection gets its own McpServer instance
         const server = new McpServer(
             { name: "mcpsvg", version: "0.1.0" },
-            { capabilities: { tools: {} } }
+            { capabilities: { tools: {}, resources: {} } }
         );
 
         registerAllTools(server, context);
+        registerAllResources(server);
 
         const transport = new SSEServerTransport("/messages", res);
         sessions.set(transport.sessionId, transport);

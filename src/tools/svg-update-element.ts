@@ -8,7 +8,7 @@ export function registerSvgUpdateElement(
 ) {
     server.tool(
         "svg_update_element",
-        "Update an existing element by ID. Change any attributes (fill, stroke, position, size, etc.). Set an attribute to empty string to remove it.",
+        "Update an existing element by ID. Change any attributes (fill, stroke, position, size, font-family, etc.). Set an attribute to empty string to remove it. Use svg_list_elements to find element IDs.",
         {
             id: z
                 .string()

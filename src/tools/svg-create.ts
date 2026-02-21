@@ -8,12 +8,26 @@ export function registerSvgCreate(
 ) {
     server.tool(
         "svg_create",
-        `Create a new SVG and open the visual editor. BUILD INCREMENTALLY: Start with just the background/canvas elements, then call svg_set multiple times to progressively add content (main shapes, then text, then details). Each call updates the live editor so the user watches the design come together step by step.`,
+        `Create a new SVG and open the visual editor.
+
+IMPORTANT: Read the svg-design-guidelines resource FIRST for quality best practices.
+
+BUILD INCREMENTALLY: Start with the <svg> root element including xmlns, viewBox, width, and height. Include a <defs> section for any gradients/filters. Add a background group. Then use svg_set calls to progressively layer content.
+
+Structure your initial SVG like this:
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 W H" width="W" height="H">
+  <defs><!-- gradients, filters, clip paths --></defs>
+  <g id="background"><!-- background shapes --></g>
+</svg>
+
+Then call svg_set to add main shapes, then text, then details. Each call updates the live editor so the user watches the design come together step by step.
+
+After building, call svg_validate_and_screenshot to check quality and visually verify the result.`,
         {
             markup: z
                 .string()
                 .describe(
-                    "SVG markup string. Start minimal — just the <svg> root with background shapes. Add more via svg_set calls."
+                    "SVG markup string. Must include <svg> with xmlns, viewBox, width, height. Include a <defs> section and background group. Add more content via svg_set calls."
                 ),
         },
         async ({ markup }) => {

@@ -8,7 +8,15 @@ export function registerSvgAddElement(
 ) {
     server.tool(
         "svg_add_element",
-        "Add a single SVG element (rect, circle, text, path, etc.) to the current document. Good for quick additions. For complex multi-element updates, prefer svg_set with the full markup.",
+        `Add a single SVG element (rect, circle, text, path, etc.) to the current document. Good for quick additions.
+
+Tips:
+- For text elements, always include font-family with fallbacks (e.g., "Inter, Helvetica, Arial, sans-serif")
+- For shapes, consider adding rx/ry for rounded corners
+- Use fill and stroke together for a polished look
+- Give elements meaningful IDs via the attributes
+
+For complex multi-element updates, prefer svg_set with the full markup.`,
         {
             tag: z
                 .string()

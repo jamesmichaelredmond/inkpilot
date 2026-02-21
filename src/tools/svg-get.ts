@@ -4,7 +4,7 @@ import type { McpServerContext } from "../mcp-server";
 export function registerSvgGet(server: McpServer, context: McpServerContext) {
     server.tool(
         "svg_get",
-        "Return the current SVG source. Includes any visual edits made by the user in the editor.",
+        "Return the current SVG source markup. Includes any visual edits made by the user in the editor. Useful for reviewing the current state before making modifications with svg_set.",
         {},
         async () => {
             const svg = context.svgDocument.getSvg();

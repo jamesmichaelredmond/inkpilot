@@ -7,6 +7,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import http from "http";
 import { SvgDocument } from "./svg-document";
+import { registerAllResources } from "./resources";
 import { registerAllTools } from "./tools";
 import type { McpServerContext } from "./mcp-server";
 
@@ -56,10 +57,11 @@ const context: McpServerContext = {
 
 const server = new McpServer(
     { name: "mcpsvg", version: "0.1.0" },
-    { capabilities: { tools: {} } }
+    { capabilities: { tools: {}, resources: {} } }
 );
 
 registerAllTools(server, context);
+registerAllResources(server);
 
 const transport = new StdioServerTransport();
 server.connect(transport);
