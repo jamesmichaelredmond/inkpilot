@@ -86,7 +86,8 @@ ${shapeGuide}
 - **Curved text** (for circular badges): Use <textPath> on a <path> arc for text that follows the badge rim. Define the arc path in <defs>.
 - **ALL text must have**: font-family="Inter, Helvetica, Arial, sans-serif" (with fallbacks)
 - **Uppercase titles**: Add letter-spacing="2" or "3" for uppercase text — it needs room to breathe
-- Use dominant-baseline="central" for vertical centering
+- **Vertical centering**: ALWAYS use dominant-baseline="central" — without it, text renders ABOVE its y coordinate. This is the #1 cause of misaligned text in SVG.
+- **Centering text in the badge face**: For a circle at cx="200" cy="200", place title at x="200" y="190" and subtitle at x="200" y="225". Both need text-anchor="middle" AND dominant-baseline="central".
 
 ### Color Strategy
 - Badges work best with 2-3 colors: a dark primary (face), a metallic/light accent (border/highlights), and white/light text

@@ -12,6 +12,8 @@ export function registerSvgAddElement(
 
 Tips:
 - For text elements, always include font-family with fallbacks (e.g., "Inter, Helvetica, Arial, sans-serif")
+- For text centering, ALWAYS include dominant-baseline="central" — without it, text renders above its y coordinate. Add text-anchor="middle" for horizontal centering.
+- To center text inside a rect/circle: set text x = shape center x, text y = shape center y, plus text-anchor="middle" and dominant-baseline="central". Calculate positions from the shape coordinates — do not eyeball.
 - For shapes, consider adding rx/ry for rounded corners
 - Use fill and stroke together for a polished look
 - Give elements meaningful IDs via the attributes

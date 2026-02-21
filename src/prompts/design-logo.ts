@@ -80,9 +80,10 @@ Before writing any SVG, decide on:
 3. **Third svg_set call**: Add the wordmark:
    - Position below the symbol (y="300" area for 400x400 canvas)
    - ALWAYS include font-family with fallbacks: font-family="Inter, Helvetica, Arial, sans-serif"
-   - Use text-anchor="middle" and dominant-baseline="central" for centering
+   - Use text-anchor="middle" for horizontal centering and dominant-baseline="central" for vertical centering — BOTH are required. Without dominant-baseline="central", text renders above its y coordinate.
    - Size proportional to canvas: 28-40px for brand name, 12-16px for tagline
    - Apply letter-spacing for uppercase text
+   - If placing text inside a shape (badge circle, button rect), calculate the center: text x = shape center x, text y = shape center y. Do NOT eyeball positions.
 
 4. **Fourth svg_set call**: Refine and polish:
    - Add any gradients or subtle shadows to <defs> if they serve the design

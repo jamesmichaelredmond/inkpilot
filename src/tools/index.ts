@@ -11,7 +11,7 @@ import { registerSvgScreenshot } from "./svg-screenshot";
 import { registerSvgSaveProject } from "./svg-save-project";
 import { registerSvgOpenProject } from "./svg-open-project";
 import { registerSvgExport } from "./svg-export";
-import { registerSvgCreateFromTemplate } from "./svg-create-from-template";
+
 import { registerSvgValidate } from "./svg-validate";
 import { registerSvgValidateAndScreenshot } from "./svg-validate-and-screenshot";
 
@@ -27,7 +27,7 @@ export function registerAllTools(server: McpServer, context: McpServerContext) {
     registerSvgSaveProject(server, context);
     registerSvgOpenProject(server, context);
     registerSvgExport(server, context);
-    registerSvgCreateFromTemplate(server, context);
+
     registerSvgValidate(server, context);
     registerSvgValidateAndScreenshot(server, context);
 }

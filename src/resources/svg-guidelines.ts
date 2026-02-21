@@ -86,7 +86,7 @@ Place ALL gradients, filters, clip paths, and patterns inside a \`<defs>\` block
   - Serif: \`font-family="Georgia, 'Times New Roman', serif"\`
   - Monospace: \`font-family="'SF Mono', 'Fira Code', monospace"\`
 - Use \`text-anchor="middle"\` with x at center for centered text
-- Use \`dominant-baseline="central"\` for vertical centering
+- **ALWAYS** use \`dominant-baseline="central"\` for vertical centering — without it, text sits above its y coordinate
 - Keep text sizes proportional to viewBox (for 400x400: headings 28-40px, body 16-20px, captions 12-14px)
 - Use \`letter-spacing\` for uppercase text (e.g., \`letter-spacing="2"\`)
 
@@ -101,6 +101,25 @@ Place ALL gradients, filters, clip paths, and patterns inside a \`<defs>\` block
   Brand Name
 </text>
 \`\`\`
+
+### Centering Text Inside Shapes (Buttons, Badges, Labels)
+
+SVG has no native button or label. Build them from a shape + centered text. Calculate positions — do NOT eyeball:
+
+\`\`\`xml
+<!-- Button: rect at (100, 180) size 200x48 -->
+<rect x="100" y="180" width="200" height="48" rx="8" fill="#3b82f6" />
+<text x="200" y="204" text-anchor="middle" dominant-baseline="central"
+      font-family="Inter, Helvetica, Arial, sans-serif" font-size="16"
+      font-weight="600" fill="#ffffff">Click Here</text>
+<!-- x = 100 + 200/2 = 200 (center of rect) -->
+<!-- y = 180 + 48/2 = 204 (center of rect) -->
+\`\`\`
+
+- **Horizontal center**: text x = rect x + (rect width / 2), then \`text-anchor="middle"\`
+- **Vertical center**: text y = rect y + (rect height / 2), then \`dominant-baseline="central"\`
+- For circles: text x = cx, text y = cy
+- For pill buttons: use \`rx\` equal to half the rect height
 
 ## 5. Color Best Practices
 

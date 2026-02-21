@@ -81,7 +81,21 @@ ${dimensionGuide}
 - **Subheading**: 18-24px, font-weight="400", same font family, lighter color than heading for contrast hierarchy
 - **Line spacing**: Position subheading 50-60px below heading baseline
 - **Text anchor**: Use text-anchor="start" for left-aligned, text-anchor="middle" for centered
+- **Vertical centering**: ALWAYS use dominant-baseline="central" on text elements — this centers text vertically on the y coordinate. Without it, text sits above its y position.
 - **ALL text must have font-family with fallbacks**
+
+### Buttons / Call-to-Action Elements
+SVG has no native button — you build them from a rounded rect + centered text. Getting the text centered is critical:
+\`\`\`
+<rect x="X" y="Y" width="W" height="H" rx="8" fill="#color" />
+<text x="X + W/2" y="Y + H/2" text-anchor="middle" dominant-baseline="central" font-family="Inter, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#fff">Button Text</text>
+\`\`\`
+- The text x = rect x + rect width / 2 (horizontal center of the rect)
+- The text y = rect y + rect height / 2 (vertical center of the rect)
+- text-anchor="middle" centers horizontally, dominant-baseline="central" centers vertically
+- Do NOT eyeball text position — always calculate from the rect's coordinates
+- Button height should be 44-52px with 16-18px text for comfortable proportions
+- Use rx="8" for subtle rounding or rx equal to half the height for a pill shape
 
 ### Background Techniques
 1. **Solid color**: Simple, clean, professional. Use a single rich color (deep navy #0f172a, warm charcoal #1e293b, brand color).
