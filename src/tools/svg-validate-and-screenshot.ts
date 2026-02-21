@@ -7,10 +7,11 @@ export function registerSvgValidateAndScreenshot(
     server: McpServer,
     context: McpServerContext
 ) {
-    server.tool(
+    server.registerTool(
         "svg_validate_and_screenshot",
-        `Validate the current SVG for quality issues AND render a PNG screenshot, both in one call. Returns validation warnings/suggestions followed by the visual screenshot. This is the recommended way to review your work — check both structural quality and visual appearance at once.`,
-        {},
+        {
+            description: `Validate the current SVG for quality issues AND render a PNG screenshot, both in one call. Returns validation warnings/suggestions followed by the visual screenshot. This is the recommended way to review your work — check both structural quality and visual appearance at once.`,
+        },
         async () => {
             const svg = context.svgDocument.getSvg();
             if (!svg) {

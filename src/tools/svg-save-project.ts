@@ -8,19 +8,21 @@ export function registerSvgSaveProject(
     server: McpServer,
     context: McpServerContext
 ) {
-    server.tool(
+    server.registerTool(
         "svg_save_project",
-        "Save the current SVG as an mcpsvg project file (.mcpsvg). This preserves the full project state so it can be reopened later.",
         {
-            path: z
-                .string()
-                .describe(
-                    "Absolute file path to save the .mcpsvg project file (e.g. /home/user/logos/brand.mcpsvg)"
-                ),
-            name: z
-                .string()
-                .optional()
-                .describe('Friendly project name (e.g. "Brand Logo")'),
+            description: "Save the current SVG as an mcpsvg project file (.mcpsvg). This preserves the full project state so it can be reopened later.",
+            inputSchema: {
+                path: z
+                    .string()
+                    .describe(
+                        "Absolute file path to save the .mcpsvg project file (e.g. /home/user/logos/brand.mcpsvg)"
+                    ),
+                name: z
+                    .string()
+                    .optional()
+                    .describe('Friendly project name (e.g. "Brand Logo")'),
+            },
         },
         async ({ path: filePath, name }) => {
             const svg = context.svgDocument.getSvg();

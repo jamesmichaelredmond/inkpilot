@@ -8,15 +8,17 @@ export function registerSvgExport(
     server: McpServer,
     context: McpServerContext
 ) {
-    server.tool(
+    server.registerTool(
         "svg_export",
-        "Export the current SVG as a standalone .svg file for use in other projects.",
         {
-            path: z
-                .string()
-                .describe(
-                    "Absolute file path to write the .svg file (e.g. /home/user/assets/logo.svg)"
-                ),
+            description: "Export the current SVG as a standalone .svg file for use in other projects.",
+            inputSchema: {
+                path: z
+                    .string()
+                    .describe(
+                        "Absolute file path to write the .svg file (e.g. /home/user/assets/logo.svg)"
+                    ),
+            },
         },
         async ({ path: filePath }) => {
             const svg = context.svgDocument.getSvg();

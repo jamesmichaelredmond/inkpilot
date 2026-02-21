@@ -3,10 +3,12 @@ import { registerDesignLogoPrompt } from "./design-logo";
 import { registerDesignIconPrompt } from "./design-icon";
 import { registerDesignBadgePrompt } from "./design-badge";
 import { registerDesignBannerPrompt } from "./design-banner";
+import { registerDesignGraphicPrompt } from "./design-graphic";
 
 export function registerAllPrompts(server: McpServer) {
     registerDesignLogoPrompt(server);
     registerDesignIconPrompt(server);
     registerDesignBadgePrompt(server);
     registerDesignBannerPrompt(server);
+    registerDesignGraphicPrompt(server);
 }

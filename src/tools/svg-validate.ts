@@ -250,9 +250,10 @@ export function registerSvgValidate(
     server: McpServer,
     context: McpServerContext
 ) {
-    server.tool(
+    server.registerTool(
         "svg_validate",
-        `Validate the current SVG for common quality issues. Checks for:
+        {
+            description: `Validate the current SVG for common quality issues. Checks for:
 - Missing viewBox or xmlns
 - Text without font-family
 - Elements outside viewBox bounds
@@ -261,7 +262,7 @@ export function registerSvgValidate(
 - Overlapping elements at same position
 
 Use this after building your SVG to catch issues before exporting. Fix any errors and warnings, then re-validate.`,
-        {},
+        },
         async () => {
             const svg = context.svgDocument.getSvg();
             if (!svg) {

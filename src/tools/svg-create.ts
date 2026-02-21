@@ -6,29 +6,39 @@ export function registerSvgCreate(
     server: McpServer,
     context: McpServerContext
 ) {
-    server.tool(
+    server.registerTool(
         "svg_create",
-        `Create a new SVG and open the visual editor.
+        {
+            description: `Create a new SVG and open the visual editor.
 
-IMPORTANT: Read the svg-design-guidelines resource FIRST for quality best practices.
+Build substantially in this first call — include the SVG root, <defs> with any gradients/filters, background, AND initial structural shapes. Don't create an empty skeleton.
 
-BUILD INCREMENTALLY: Start with the <svg> root element including xmlns, viewBox, width, and height. Include a <defs> section for any gradients/filters. Add a background group. Then use svg_set calls to progressively layer content.
-
-Structure your initial SVG like this:
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 W H" width="W" height="H">
-  <defs><!-- gradients, filters, clip paths --></defs>
-  <g id="background"><!-- background shapes --></g>
+Structure example:
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e85d04" />
+      <stop offset="100%" stop-color="#dc2f02" />
+    </linearGradient>
+  </defs>
+  <g id="background"><rect id="bg" width="400" height="400" fill="#fefae0" /></g>
+  <g id="main-content"><!-- shapes here --></g>
 </svg>
 
-Then call svg_set to add main shapes, then text, then details. Each call updates the live editor so the user watches the design come together step by step.
+Then use svg_set to complete the design (add text, details, refinements). Aim for 1-2 svg_set calls total, then svg_validate_and_screenshot.
 
-After building, call svg_validate_and_screenshot to check quality and visually verify the result.`,
-        {
-            markup: z
-                .string()
-                .describe(
-                    "SVG markup string. Must include <svg> with xmlns, viewBox, width, height. Include a <defs> section and background group. Add more content via svg_set calls."
-                ),
+Key reminders:
+- Give ALL visual elements meaningful id attributes
+- Put gradients/filters/clipPaths inside <defs>
+- Use transform="translate(cx,cy)" on groups to center content
+- For text: ALWAYS use dominant-baseline="central" + text-anchor="middle" + font-family with fallbacks`,
+            inputSchema: {
+                markup: z
+                    .string()
+                    .describe(
+                        "SVG markup string. Must include <svg> with xmlns, viewBox, width, height. Include a <defs> section and background group. Add more content via svg_set calls."
+                    ),
+            },
         },
         async ({ markup }) => {
             context.openEditor();

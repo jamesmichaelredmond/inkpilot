@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { getCreativeNudge } from "./shared-design-philosophy";
 
 export function registerDesignBannerPrompt(server: McpServer) {
     server.registerPrompt(
@@ -46,12 +47,12 @@ export function registerDesignBannerPrompt(server: McpServer) {
 
             const dimensionGuide =
                 purposeChoice === "social-media"
-                    ? `Use viewBox="0 0 1200 630" (Open Graph / social share ratio). Key content within center 1000x500 safe zone.`
+                    ? `viewBox="0 0 1200 630" (Open Graph ratio). Key content within center 1000x500.`
                     : purposeChoice === "email-header"
-                      ? `Use viewBox="0 0 600 200" (email-safe width, compact height). Keep text large — emails render at variable sizes.`
+                      ? `viewBox="0 0 600 200" (email-safe width). Keep text large.`
                       : purposeChoice === "event"
-                        ? `Use viewBox="0 0 1200 600" (event banner, taller for impact). Center the event name prominently.`
-                        : `Use viewBox="0 0 1200 400" (standard wide hero banner). Content weighted left or centered.`;
+                        ? `viewBox="0 0 1200 600" (taller for impact).`
+                        : `viewBox="0 0 1200 400" (standard hero banner).`;
 
             return {
                 description: `Design a ${purposeChoice} banner with heading "${heading}"`,
@@ -64,82 +65,62 @@ export function registerDesignBannerPrompt(server: McpServer) {
 
 Heading: "${heading}"${subCtx}
 Purpose: ${purposeChoice}${colorCtx}${descCtx}
+Dimensions: ${dimensionGuide}
 
-## Banner Design Rules
+${getCreativeNudge()}
 
-### Dimensions
-${dimensionGuide}
+## Reference Example
 
-### Layout Principles
-- **Visual hierarchy**: Heading is the dominant element — largest, boldest, most prominent. Subheading supports but doesn't compete.
-- **Content zones**: Divide the banner into zones — typically left 60% for text content, right 40% for visual elements (or fully centered text with decorative elements behind).
-- **Breathing room**: Minimum 60-80px padding from all edges. Text should never touch or approach the banner boundary.
-- **Alignment**: Left-align text for a modern editorial feel, or center-align for symmetrical/formal presentations. Don't mix alignments.
+Study this banner SVG. Match its layout, typography hierarchy, and background treatment:
 
-### Typography
-- **Heading**: 40-56px, font-weight="700" or "800", use font-family="Inter, Helvetica, Arial, sans-serif"
-- **Subheading**: 18-24px, font-weight="400", same font family, lighter color than heading for contrast hierarchy
-- **Line spacing**: Position subheading 50-60px below heading baseline
-- **Text anchor**: Use text-anchor="start" for left-aligned, text-anchor="middle" for centered
-- **Vertical centering**: ALWAYS use dominant-baseline="central" on text elements — this centers text vertically on the y coordinate. Without it, text sits above its y position.
-- **ALL text must have font-family with fallbacks**
-
-### Buttons / Call-to-Action Elements
-SVG has no native button — you build them from a rounded rect + centered text. Getting the text centered is critical:
+\`\`\`xml
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a2e" />
+      <stop offset="100%" stop-color="#16213e" />
+    </linearGradient>
+  </defs>
+  <g id="background">
+    <rect id="bg" width="1200" height="400" fill="url(#bg-grad)" />
+    <circle id="accent-orb" cx="950" cy="200" r="280" fill="#e94560" opacity="0.08" />
+    <circle id="accent-orb-sm" cx="1050" cy="150" r="120" fill="#e94560" opacity="0.05" />
+  </g>
+  <g id="content">
+    <text id="heading" x="100" y="165" text-anchor="start" dominant-baseline="central"
+          font-family="Georgia, 'Times New Roman', serif" font-size="52" font-weight="700"
+          fill="#f8f8f8">Launch Something Bold</text>
+    <text id="subheading" x="100" y="230" text-anchor="start" dominant-baseline="central"
+          font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="400"
+          fill="#8a8a9a">The platform for teams that ship fast and think different.</text>
+    <rect id="cta-btn" x="100" y="275" width="200" height="48" rx="8" fill="#e94560" />
+    <text id="cta-text" x="200" y="299" text-anchor="middle" dominant-baseline="central"
+          font-family="Trebuchet MS, Helvetica, sans-serif" font-size="16" font-weight="600"
+          fill="#ffffff">Get Started</text>
+  </g>
+</svg>
 \`\`\`
-<rect x="X" y="Y" width="W" height="H" rx="8" fill="#color" />
-<text x="X + W/2" y="Y + H/2" text-anchor="middle" dominant-baseline="central" font-family="Inter, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#fff">Button Text</text>
-\`\`\`
-- The text x = rect x + rect width / 2 (horizontal center of the rect)
-- The text y = rect y + rect height / 2 (vertical center of the rect)
-- text-anchor="middle" centers horizontally, dominant-baseline="central" centers vertically
-- Do NOT eyeball text position — always calculate from the rect's coordinates
-- Button height should be 44-52px with 16-18px text for comfortable proportions
-- Use rx="8" for subtle rounding or rx equal to half the height for a pill shape
 
-### Background Techniques
-1. **Solid color**: Simple, clean, professional. Use a single rich color (deep navy #0f172a, warm charcoal #1e293b, brand color).
-2. **Subtle gradient**: Linear gradient at slight angle (x1="0%" y1="0%" x2="100%" y2="100%") with two close tones of the same hue. Avoid rainbow or multi-hue gradients.
-3. **Geometric pattern**: Subtle shapes in the background at low opacity (5-15%) — circles, lines, dots, abstract geometric forms. They add texture without distracting from text.
-4. **Split/accent**: A bold accent shape (angled rectangle, circle, wave) that occupies 30-40% of the banner, creating visual interest and a natural zone for secondary content.
+Notice: angled gradient background, subtle accent orbs at low opacity for depth, left-aligned editorial layout, clear heading/subheading hierarchy (size + color contrast), CTA button with mathematically centered text (text x = rect x + width/2, text y = rect y + height/2), dominant-baseline="central" on ALL text, 100px padding from left edge.
 
-### Color for Banners
-- **Dark backgrounds** with light text are more impactful and modern for hero banners
-- **Light backgrounds** work better for email headers and announcements
-- Heading text: white (#ffffff) on dark, near-black (#0f172a) on light
-- Subheading text: slightly muted version of heading color (e.g., #94a3b8 on dark, #64748b on light)
-- Accent colors: Use sparingly — a single accent shape, underline, or highlight
-- Maximum 3 colors total in the banner
+## Build Process
 
-### Decorative Elements
-- **Abstract shapes**: Circles, rounded rectangles, or custom paths at low opacity behind or beside text
-- **Accent lines**: Horizontal rules or decorative separators between heading and subheading
-- **Geometric accents**: A bold shape (large circle, angled stripe) partially visible at the edge creates dynamism
-- Keep decorations subordinate to text — they support, never compete
+1. **svg_create**: Set up the canvas with correct dimensions, <defs> (background gradient), background shapes, and any large decorative elements (accent shapes, patterns). Build the foundation substantially.
 
-### Build Process
-1. **svg_create**: Set up the canvas with correct dimensions, <defs> for gradients, background group
-2. **svg_set**: Build the background — solid fill, gradient, or pattern. Add any large decorative shapes.
-3. **svg_set**: Add heading and subheading text with proper font styling, positioning, and color
-4. **svg_set**: Add accent elements — decorative shapes, lines, secondary visual elements
-5. **svg_validate_and_screenshot**: Review. Check:
-   - Is the heading immediately readable and dominant?
-   - Is there clear hierarchy between heading and subheading?
-   - Does the background support (not fight) the text?
-   - Is there enough padding from edges?
-   - Does the overall composition feel balanced (not lopsided)?
-   - Are the colors cohesive?
+2. **svg_set**: Complete the design — add heading, subheading, CTA button if appropriate, and any accent details. Remember:
+   - ALL text needs dominant-baseline="central" + font-family with fallbacks
+   - Heading: 40-56px, bold (700-800), dominant color
+   - Subheading: 18-24px, regular (400), muted color for hierarchy
+   - Button text centering: x = rect x + rect width/2, y = rect y + rect height/2
+   - Minimum 60-80px padding from all edges
+   - Maximum 3 colors total
 
-### After presenting the design
-Tell the user you can explore alternative directions — a different layout, color scheme, or background style — if they'd like to see other options.
+3. **svg_validate_and_screenshot**: Review. Is the heading immediately dominant? Clear hierarchy? Background supports text without fighting it? Enough padding from edges?
 
-### What NOT to do
-- Don't make the subheading compete with the heading for attention
-- Don't use more than 2 font sizes (heading + subheading)
-- Don't add so many decorative elements that they distract from the message
-- Don't use busy multi-color gradients (stick to 2 tones of one hue)
-- Don't center-align text in a left-weighted composition (or vice versa)
-- Don't forget that banners are often cropped — keep critical content in the center 80%`,
+Do NOT automatically save or export the file. After presenting the design, let the user know they can:
+- Request adjustments (text, colors, layout, background treatment)
+- Explore alternative layouts, color schemes, or background styles
+- Save the project (svg_save_project) or export as .svg (svg_export) when they're happy with it`,
                         },
                     },
                 ],

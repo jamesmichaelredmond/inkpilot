@@ -5,10 +5,11 @@ export function registerSvgListElements(
     server: McpServer,
     context: McpServerContext
 ) {
-    server.tool(
+    server.registerTool(
         "svg_list_elements",
-        "List all elements in the current SVG with their IDs, tag names, and key attributes.",
-        {},
+        {
+            description: "List all elements in the current SVG with their IDs, tag names, and key attributes.",
+        },
         async () => {
             const elements = context.svgDocument.listElements();
             if (elements.length === 0) {

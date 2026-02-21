@@ -6,9 +6,10 @@ export function registerSvgScreenshot(
     server: McpServer,
     context: McpServerContext
 ) {
-    server.tool(
+    server.registerTool(
         "svg_screenshot",
-        `Render the current SVG to a PNG image and return it as base64. Use this for visual feedback and quality review.
+        {
+            description: `Render the current SVG to a PNG image and return it as base64. Use this for visual feedback and quality review.
 
 IMPORTANT: Call this after every major design step to verify your work visually. Check for:
 - Text readability and alignment
@@ -18,7 +19,7 @@ IMPORTANT: Call this after every major design step to verify your work visually.
 - Overall visual balance and professionalism
 
 If something looks wrong, use svg_set to fix it, then screenshot again.`,
-        {},
+        },
         async () => {
             const svg = context.svgDocument.getSvg();
             if (!svg) {

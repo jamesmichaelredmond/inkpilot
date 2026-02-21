@@ -6,15 +6,17 @@ export function registerSvgRemoveElement(
     server: McpServer,
     context: McpServerContext
 ) {
-    server.tool(
+    server.registerTool(
         "svg_remove_element",
-        "Remove an element from the SVG by its ID.",
         {
-            id: z
-                .string()
-                .describe(
-                    "The element ID to remove (use svg_list_elements to find IDs)"
-                ),
+            description: "Remove an element from the SVG by its ID.",
+            inputSchema: {
+                id: z
+                    .string()
+                    .describe(
+                        "The element ID to remove (use svg_list_elements to find IDs)"
+                    ),
+            },
         },
         async ({ id }) => {
             const success = context.svgDocument.removeElement(id);

@@ -6,9 +6,10 @@ export function registerSvgAddElement(
     server: McpServer,
     context: McpServerContext
 ) {
-    server.tool(
+    server.registerTool(
         "svg_add_element",
-        `Add a single SVG element (rect, circle, text, path, etc.) to the current document. Good for quick additions.
+        {
+            description: `Add a single SVG element (rect, circle, text, path, etc.) to the current document. Good for quick additions.
 
 Tips:
 - For text elements, always include font-family with fallbacks (e.g., "Inter, Helvetica, Arial, sans-serif")
@@ -19,17 +20,18 @@ Tips:
 - Give elements meaningful IDs via the attributes
 
 For complex multi-element updates, prefer svg_set with the full markup.`,
-        {
-            tag: z
-                .string()
-                .describe(
-                    "SVG element tag name (e.g. rect, circle, path, text, g)"
-                ),
-            attributes: z
-                .record(z.string())
-                .describe(
-                    'Element attributes as key-value pairs (e.g. {"cx":"50","cy":"50","r":"25","fill":"blue"})'
-                ),
+            inputSchema: {
+                tag: z
+                    .string()
+                    .describe(
+                        "SVG element tag name (e.g. rect, circle, path, text, g)"
+                    ),
+                attributes: z
+                    .record(z.string())
+                    .describe(
+                        'Element attributes as key-value pairs (e.g. {"cx":"50","cy":"50","r":"25","fill":"blue"})'
+                    ),
+            },
         },
         async ({ tag, attributes }) => {
             context.openEditor();

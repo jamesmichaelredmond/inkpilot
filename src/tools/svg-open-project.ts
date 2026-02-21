@@ -7,15 +7,17 @@ export function registerSvgOpenProject(
     server: McpServer,
     context: McpServerContext
 ) {
-    server.tool(
+    server.registerTool(
         "svg_open_project",
-        "Open an mcpsvg project file (.mcpsvg) and load its SVG into the editor.",
         {
-            path: z
-                .string()
-                .describe(
-                    "Absolute file path to the .mcpsvg project file to open"
-                ),
+            description: "Open an mcpsvg project file (.mcpsvg) and load its SVG into the editor.",
+            inputSchema: {
+                path: z
+                    .string()
+                    .describe(
+                        "Absolute file path to the .mcpsvg project file to open"
+                    ),
+            },
         },
         async ({ path: filePath }) => {
             if (!fs.existsSync(filePath)) {

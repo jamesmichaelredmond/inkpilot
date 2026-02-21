@@ -212,10 +212,62 @@ Before finalizing any SVG, verify:
 4. Use \`svg_validate\` to check for structural issues
 5. Iterate: fix any problems found, re-screenshot, confirm quality
 6. Export when satisfied
+
+## 11. Aesthetic Quality Standards
+
+### Typography — System Fonts with Character
+Prefer fonts that carry visual personality over invisible defaults:
+- **Geometric/Modern**: Century Gothic, Trebuchet MS
+- **Editorial/Authoritative**: Georgia, Palatino Linotype, Garamond
+- **Raw/Mechanical**: Courier New, monospace
+- **Impact statements**: Impact, 'Arial Black' (use sparingly, single words only)
+- **Clarity at small sizes**: Verdana (digital-native, wide letterforms)
+- **Avoid as first choice**: Inter, Helvetica, Arial, Roboto — not because they are bad,
+  but because they are invisible. Use them only when deliberate neutrality IS the concept.
+
+### Color Palettes to Avoid (Overused by AI)
+These are statistically the most AI-generated color combinations — avoid unless brand-mandated:
+- Navy #0f172a + gold/amber as the default "professional" palette
+- Deep navy + teal #06b6d4
+- Purple/indigo gradient (#6366f1 → #8b5cf6)
+- Navy + gold, deep red + silver, forest green + cream as badge defaults
+- Three-tone safe palettes applied so cautiously they read as monochrome
+
+### SVG Texture and Depth Techniques
+Use SVG's native capabilities before reaching for simple flat fills:
+- **Noise/grain**: \`<feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3"/>\`
+  combined with \`<feColorMatrix>\` to extract alpha channel = grain overlay
+- **Soft glow**: \`<feGaussianBlur>\` on a duplicate shape underneath the main shape
+- **Light depth**: Multiple \`<radialGradient>\` circles at varying opacities (10-30%)
+- **Pattern texture**: \`<pattern>\` with geometric micro-elements (dots, lines, crosses)
+- **Angled gradients**: \`gradientTransform="rotate(37, 0.5, 0.5)"\` for unexpected depth
+
+### Composition Principles
+- Off-center focal points create more visual tension than perfectly centered compositions
+- Overlap elements deliberately — a shape partially hidden by another creates depth
+- Use the full canvas edge: elements that bleed off-edge feel intentional, not clipped
+- Diagonal elements (\`transform="rotate(N)"\`) break horizontal/vertical rigidity
+- Asymmetry is not imbalance — a large dark area can balance many small light elements
+- Vary corner radii within a design — not every rectangle needs the same rx value
+
+## 12. Common Aesthetic Failures
+
+These patterns indicate generic AI output. If your design contains these, reconsider:
+
+1. Navy or charcoal background as the default "safe" choice
+2. Inter or Helvetica as the first typography instinct
+3. A gradient from color X to a slightly lighter/darker color X
+4. A perfectly centered, perfectly symmetrical composition with no visual tension
+5. Clip-art concepts: globe, gear, rocket, lightbulb, shield, swoosh
+6. Five-pointed stars as decorative accents
+7. Drop shadows on every elevated element
+8. Three horizontal color bands as a background
+9. All corners the same radius (mix rx values or use sharp corners deliberately)
+10. Concentric circles with "CERTIFIED" text as the only badge concept
 `;
 
 export function registerSvgGuidelines(server: McpServer) {
-    server.resource(
+    server.registerResource(
         "svg-design-guidelines",
         SVG_GUIDELINES_URI,
         {
