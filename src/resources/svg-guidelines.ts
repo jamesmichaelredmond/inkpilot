@@ -190,7 +190,74 @@ SVG has no native button or label. Build them from a shape + centered text. Calc
 <line x1="100" y1="280" x2="300" y2="280" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" />
 \`\`\`
 
-## 9. Quality Checklist
+## 9. Curved Text on Paths
+
+For circular logos, badges, and seals, text often follows a curved path using \`<textPath>\`. Getting this right requires precise arc math.
+
+### Top-of-Circle Text
+
+Arc sweeps left-to-right across the top. Text reads normally.
+
+\`\`\`xml
+<defs>
+  <!-- For a circle centered at (cx, cy), text at radius r -->
+  <!-- Start: (cx - r, cy) → End: (cx + r, cy), sweep-flag=1 (clockwise over top) -->
+  <path id="top-arc" d="M [cx-r],[cy] A [r],[r] 0 0,1 [cx+r],[cy]" fill="none" />
+</defs>
+<text>
+  <textPath href="#top-arc" startOffset="50%" text-anchor="middle"
+            font-family="Georgia, serif" font-size="14" fill="#333">
+    TOP TEXT HERE
+  </textPath>
+</text>
+\`\`\`
+
+### Bottom-of-Circle Text (Right-Side Up)
+
+**Critical**: the arc MUST sweep right-to-left so text reads left-to-right and is NOT upside down.
+
+\`\`\`xml
+<defs>
+  <!-- Start: (cx + r, cy) → End: (cx - r, cy), sweep-flag=1 (clockwise under bottom) -->
+  <path id="bottom-arc" d="M [cx+r],[cy] A [r],[r] 0 0,1 [cx-r],[cy]" fill="none" />
+</defs>
+<text>
+  <textPath href="#bottom-arc" startOffset="50%" text-anchor="middle"
+            font-family="Georgia, serif" font-size="14" fill="#333">
+    BOTTOM TEXT HERE
+  </textPath>
+</text>
+\`\`\`
+
+### Concrete Example — Badge at (200, 200), Text Radius 100
+
+\`\`\`xml
+<defs>
+  <path id="top-arc" d="M 100,200 A 100,100 0 0,1 300,200" fill="none" />
+  <path id="bottom-arc" d="M 300,200 A 100,100 0 0,1 100,200" fill="none" />
+</defs>
+
+<text><textPath href="#top-arc" startOffset="50%" text-anchor="middle"
+  font-family="Georgia, serif" font-size="14" letter-spacing="3"
+  fill="#333">ESTABLISHED 2024</textPath></text>
+
+<text><textPath href="#bottom-arc" startOffset="50%" text-anchor="middle"
+  font-family="Georgia, serif" font-size="14" letter-spacing="3"
+  fill="#333">PREMIUM QUALITY</textPath></text>
+\`\`\`
+
+### Key Rules
+
+- **Text radius**: use a radius 15-25px larger than the visual circle the text follows
+- **Letter-spacing**: 2-5px improves readability on curves (larger radius = less spacing needed)
+- **Bottom text MUST use a reversed arc** (right-to-left start point) or it renders upside down
+- **Always** put arc \`<path>\` elements inside \`<defs>\` — they are invisible guides
+- Use \`fill="none"\` on the path; only add \`stroke\` for debugging
+- **Always** use \`startOffset="50%"\` + \`text-anchor="middle"\` to center text on the arc
+- For partial arcs (less than semicircle), calculate endpoints with: \`cx + r*cos(angle)\`, \`cy - r*sin(angle)\` (SVG y-axis is inverted)
+- \`font-family\` with fallbacks is still required on the \`<textPath>\` or its parent \`<text>\`
+
+## 10. Quality Checklist
 
 Before finalizing any SVG, verify:
 1. viewBox is set and matches the design canvas
@@ -204,7 +271,7 @@ Before finalizing any SVG, verify:
 9. Design has appropriate whitespace/padding from edges
 10. Call \`svg_validate_and_screenshot\` and review the result visually
 
-## 10. Recommended Workflow
+## 11. Recommended Workflow
 
 1. Start with \`svg_create\` — set up root \`<svg>\` with correct viewBox, \`<defs>\`, and background
 2. Use \`svg_set\` to progressively build: main shapes, then details, then text
@@ -212,7 +279,7 @@ Before finalizing any SVG, verify:
 4. Iterate: fix any problems found, re-validate, confirm quality
 5. Export when satisfied
 
-## 11. Aesthetic Quality Standards
+## 12. Aesthetic Quality Standards
 
 ### Typography — System Fonts with Character
 Prefer fonts that carry visual personality over invisible defaults:
@@ -249,7 +316,7 @@ Use SVG's native capabilities before reaching for simple flat fills:
 - Asymmetry is not imbalance — a large dark area can balance many small light elements
 - Vary corner radii within a design — not every rectangle needs the same rx value
 
-## 12. Common Aesthetic Failures
+## 13. Common Aesthetic Failures
 
 These patterns indicate generic AI output. If your design contains these, reconsider:
 

@@ -241,5 +241,68 @@ export function validateSvg(svgMarkup: string): ValidationIssue[] {
         });
     }
 
+    // 12. Check <textPath> elements for missing or broken href
+    const textPaths = svgEl.querySelectorAll("textPath");
+    for (const tp of textPaths) {
+        const href = tp.getAttribute("href") || tp.getAttribute("xlink:href");
+        if (!href) {
+            issues.push({
+                severity: "error",
+                message: `<textPath> element has no href attribute. Add href="#pathId" referencing a <path> in <defs>.`,
+            });
+        } else {
+            const pathId = href.replace(/^#/, "");
+            const referencedPath = svgEl.querySelector(`#${pathId}`);
+            if (!referencedPath) {
+                issues.push({
+                    severity: "error",
+                    message: `<textPath> references "#${pathId}" but no element with that ID exists. Define the arc path in <defs>.`,
+                });
+            } else if (referencedPath.tagName !== "path") {
+                issues.push({
+                    severity: "warning",
+                    message: `<textPath> references "#${pathId}" which is a <${referencedPath.tagName}>, not a <path>. textPath works best with <path> elements.`,
+                });
+            }
+        }
+    }
+
+    // 13. Check <textPath> for missing centering attributes
+    for (const tp of textPaths) {
+        const startOffset = tp.getAttribute("startOffset");
+        const textAnchor = tp.getAttribute("text-anchor");
+        const parentText = tp.parentNode as any;
+        const parentAnchor = parentText?.getAttribute?.("text-anchor");
+
+        if (!startOffset && !(textAnchor || parentAnchor)) {
+            issues.push({
+                severity: "warning",
+                message: `<textPath> has no startOffset or text-anchor. Text will bunch at the start of the path. Add startOffset="50%" and text-anchor="middle" to center it.`,
+            });
+        }
+    }
+
+    // 14. Check for textPath on a full-circle path (causes overlapping text)
+    if (defs) {
+        for (const tp of textPaths) {
+            const href = tp.getAttribute("href") || tp.getAttribute("xlink:href");
+            if (!href) continue;
+            const pathId = href.replace(/^#/, "");
+            const pathEl = defs.querySelector(`#${pathId}`);
+            if (!pathEl) continue;
+            const d = pathEl.getAttribute("d") || "";
+            // Detect full circles: two arc commands that form a complete circle
+            // e.g., M cx,cy-r A r,r 0 1,1 cx,cy+r A r,r 0 1,1 cx,cy-r
+            const arcCount = (d.match(/[Aa]\s/g) || []).length;
+            if (arcCount >= 2) {
+                issues.push({
+                    severity: "warning",
+                    message: `<textPath> references path "#${pathId}" which appears to be a full circle (${arcCount} arc commands). Use a semicircular arc instead — full circles cause text to overlap. See guidelines section 9.`,
+                    element: pathId,
+                });
+            }
+        }
+    }
+
     return issues;
 }

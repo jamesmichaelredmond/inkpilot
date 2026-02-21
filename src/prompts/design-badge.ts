@@ -119,7 +119,12 @@ ${shapeGuide}
    - ALL text needs text-anchor="middle" + dominant-baseline="central" + font-family with fallbacks
    - Title: bold (700), 24-32px, with letter-spacing="3" or "4" for uppercase
    - Subtitle: regular (400), 12-16px, ~40px below title
-   - For curved text on circular badges: use <textPath> on an arc <path> in <defs>
+   - For curved text on circular badges: use <textPath> on a semicircular arc <path> in <defs>.
+     Top arc: \`<path id="top-arc" d="M [cx-r],[cy] A [r],[r] 0 0,1 [cx+r],[cy]" fill="none" />\`
+     Bottom arc (NOT upside down — must sweep right-to-left): \`<path id="bottom-arc" d="M [cx+r],[cy] A [r],[r] 0 0,1 [cx-r],[cy]" fill="none" />\`
+     Then: \`<text><textPath href="#top-arc" startOffset="50%" text-anchor="middle" ...>TEXT</textPath></text>\`
+     For a 400x400 badge with text at radius 165: top-arc d="M 35,200 A 165,165 0 0,1 365,200", bottom-arc d="M 365,200 A 165,165 0 0,1 35,200"
+     Always use startOffset="50%" + text-anchor="middle" to center. Add letter-spacing="3" for readability on curves.
    - Maximum 2-3 decorative elements — restraint reads as premium
 
 3. **svg_validate_and_screenshot**: Review. Is text readable against the badge face? Do colors feel premium? Is there clear title/subtitle hierarchy?
