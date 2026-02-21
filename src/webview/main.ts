@@ -1,50 +1,43 @@
-import {
-    Canvas,
-    loadSVGFromString,
-    FabricObject,
-    Rect,
-    Shadow,
-    util,
-} from "fabric";
 import { initToolbar } from "./toolbar";
-import { initProperties } from "./properties";
 
+declare function acquireVsCodeApi(): { postMessage(message: unknown): void };
 const vscode = acquireVsCodeApi();
 
-let canvas: Canvas;
-let isUpdatingFromHost = false;
+let svgPreview: HTMLImageElement;
+let container: HTMLElement;
+
+let currentSvgString = "";
+let svgW = 0;
+let svgH = 0;
+
+// Zoom/pan state
+let zoom = 1;
+let panX = 0;
+let panY = 0;
+
+// Pan interaction state
+let isPanning = false;
+let lastPanX = 0;
+let lastPanY = 0;
+let spaceHeld = false;
 
 function init() {
-    const canvasEl = document.getElementById("canvas") as HTMLCanvasElement;
-    const container = document.getElementById("canvas-container")!;
+    svgPreview = document.getElementById("svg-preview") as HTMLImageElement;
+    container = document.getElementById("canvas-container")!;
 
-    canvas = new Canvas(canvasEl, {
-        width: container.clientWidth,
-        height: container.clientHeight,
-        // No backgroundColor — the CSS workspace grey shows through the transparent canvas
-        selection: true,
-        preserveObjectStacking: true,
-    });
+    // Make container focusable for keyboard events
+    container.setAttribute("tabindex", "0");
+    container.style.outline = "none";
+    requestAnimationFrame(() => container.focus());
 
-    initToolbar(canvas, vscode);
-    initProperties(canvas, vscode);
-
-    // Resize canvas when container resizes
-    const resizeObserver = new ResizeObserver(() => {
-        canvas.setDimensions({
-            width: container.clientWidth,
-            height: container.clientHeight,
-        });
-        canvas.renderAll();
-    });
-    resizeObserver.observe(container);
+    initToolbar(vscode);
 
     // Handle messages from extension host
     window.addEventListener("message", async (event) => {
         const message = event.data;
         switch (message.type) {
             case "updateSvg":
-                await loadSvg(message.svg);
+                loadSvg(message.svg);
                 break;
             case "requestScreenshot":
                 sendScreenshot();
@@ -52,124 +45,172 @@ function init() {
         }
     });
 
-    // Sync changes back to extension host on user interaction
-    canvas.on("object:modified", () => {
-        if (!isUpdatingFromHost) {
-            sendSvgToHost();
+    // Resize handling
+    const resizeObserver = new ResizeObserver(() => {
+        if (svgW > 0 && svgH > 0) {
+            fitToViewport();
         }
     });
-    canvas.on("object:removed", () => {
-        if (!isUpdatingFromHost) {
-            sendSvgToHost();
+    resizeObserver.observe(container);
+
+    // --- Zoom (scroll wheel toward cursor) ---
+    container.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        const delta = e.deltaY;
+        const newZoom = Math.min(Math.max(zoom * 0.999 ** delta, 0.1), 20);
+
+        // Zoom toward cursor position
+        const rect = container.getBoundingClientRect();
+        const cursorX = e.clientX - rect.left;
+        const cursorY = e.clientY - rect.top;
+        panX = cursorX - (cursorX - panX) * (newZoom / zoom);
+        panY = cursorY - (cursorY - panY) * (newZoom / zoom);
+        zoom = newZoom;
+
+        applyTransform();
+    }, { passive: false });
+
+    // --- Pan (Space+drag or middle-mouse-drag) ---
+    const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.code === "Space" && !spaceHeld) {
+            e.preventDefault();
+            e.stopPropagation();
+            spaceHeld = true;
+            container.style.cursor = "grab";
+        }
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+        if (e.code === "Space") {
+            e.preventDefault();
+            e.stopPropagation();
+            spaceHeld = false;
+            if (!isPanning) {
+                container.style.cursor = "default";
+            }
+        }
+    };
+    container.addEventListener("keydown", handleKeyDown);
+    container.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    container.addEventListener("mousedown", (e) => {
+        container.focus();
+        // Pan with: middle mouse, Space+left click, or Alt+left click
+        if (
+            e.button === 1 ||
+            ((spaceHeld || e.altKey) && e.button === 0)
+        ) {
+            isPanning = true;
+            lastPanX = e.clientX;
+            lastPanY = e.clientY;
+            container.style.cursor = "grabbing";
+            e.preventDefault();
         }
     });
+
+    container.addEventListener("mousemove", (e) => {
+        if (!isPanning) return;
+        panX += e.clientX - lastPanX;
+        panY += e.clientY - lastPanY;
+        lastPanX = e.clientX;
+        lastPanY = e.clientY;
+        applyTransform();
+    });
+
+    const endPan = () => {
+        if (isPanning) {
+            isPanning = false;
+            container.style.cursor = spaceHeld ? "grab" : "default";
+        }
+    };
+    container.addEventListener("mouseup", endPan);
+    container.addEventListener("mouseleave", endPan);
 }
 
-async function loadSvg(svgString: string) {
+function loadSvg(svgString: string) {
     if (!svgString) return;
-    isUpdatingFromHost = true;
-    canvas.clear();
+    currentSvgString = svgString;
 
-    try {
-        const result = await loadSVGFromString(svgString);
-        const objects: FabricObject[] = result.objects.filter(
-            (o): o is FabricObject => o !== null
-        );
+    // Parse SVG dimensions
+    const parser = new DOMParser();
+    const svgDoc = parser.parseFromString(svgString, "image/svg+xml");
+    const svgEl = svgDoc.querySelector("svg");
 
-        // Parse SVG dimensions for artboard
-        const parser = new DOMParser();
-        const svgDoc = parser.parseFromString(svgString, "image/svg+xml");
-        const svgEl = svgDoc.querySelector("svg");
-
-        let svgW = 0;
-        let svgH = 0;
-        if (svgEl) {
-            svgW = parseFloat(svgEl.getAttribute("width") || "0");
-            svgH = parseFloat(svgEl.getAttribute("height") || "0");
-            // Fall back to viewBox dimensions
-            if ((svgW <= 0 || svgH <= 0) && svgEl.getAttribute("viewBox")) {
-                const vb = svgEl.getAttribute("viewBox")!.split(/[\s,]+/);
-                if (vb.length === 4) {
-                    svgW = parseFloat(vb[2]);
-                    svgH = parseFloat(vb[3]);
-                }
+    svgW = 0;
+    svgH = 0;
+    if (svgEl) {
+        svgW = parseFloat(svgEl.getAttribute("width") || "0");
+        svgH = parseFloat(svgEl.getAttribute("height") || "0");
+        // Fall back to viewBox dimensions
+        if ((svgW <= 0 || svgH <= 0) && svgEl.getAttribute("viewBox")) {
+            const vb = svgEl.getAttribute("viewBox")!.split(/[\s,]+/);
+            if (vb.length === 4) {
+                svgW = parseFloat(vb[2]);
+                svgH = parseFloat(vb[3]);
             }
         }
-
-        // Add artboard — a white rectangle representing the document area (like Illustrator)
-        if (svgW > 0 && svgH > 0) {
-            const artboard = new Rect({
-                left: 0,
-                top: 0,
-                width: svgW,
-                height: svgH,
-                fill: "#ffffff",
-                selectable: false,
-                evented: false,
-                hoverCursor: "default",
-                shadow: new Shadow({
-                    color: "rgba(0,0,0,0.25)",
-                    blur: 12,
-                    offsetX: 0,
-                    offsetY: 2,
-                }),
-            });
-            (artboard as any).__isArtboard = true;
-            canvas.add(artboard);
-        }
-
-        // Add SVG objects on top of artboard
-        if (objects.length > 0) {
-            for (const obj of objects) {
-                canvas.add(obj);
-            }
-        }
-
-        // Always keep canvas filling the container
-        const containerEl = document.getElementById("canvas-container")!;
-        canvas.setDimensions({
-            width: containerEl.clientWidth,
-            height: containerEl.clientHeight,
-        });
-
-        // Center and fit the SVG content in the viewport
-        if (svgW > 0 && svgH > 0) {
-            const padding = 60;
-            const scaleX = (containerEl.clientWidth - padding * 2) / svgW;
-            const scaleY = (containerEl.clientHeight - padding * 2) / svgH;
-            const zoom = Math.min(scaleX, scaleY, 3); // don't zoom beyond 3x
-            const offsetX = (containerEl.clientWidth - svgW * zoom) / 2;
-            const offsetY = (containerEl.clientHeight - svgH * zoom) / 2;
-            canvas.setViewportTransform([zoom, 0, 0, zoom, offsetX, offsetY]);
-        }
-
-        canvas.renderAll();
-    } catch (e) {
-        console.error("Failed to load SVG:", e);
     }
 
-    isUpdatingFromHost = false;
+    // Set native SVG rendering via data URL
+    svgPreview.src =
+        "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgString);
+
+    // Set intrinsic dimensions so the img has correct aspect ratio
+    if (svgW > 0 && svgH > 0) {
+        svgPreview.style.width = `${svgW}px`;
+        svgPreview.style.height = `${svgH}px`;
+    }
+
+    fitToViewport();
 }
 
-function sendSvgToHost() {
-    // Temporarily remove artboard so it's not exported in the SVG
-    const objects = canvas.getObjects();
-    const artboard = objects.find((o: any) => o.__isArtboard);
+function fitToViewport() {
+    if (svgW <= 0 || svgH <= 0) return;
+    const padding = 60;
+    const scaleX = (container.clientWidth - padding * 2) / svgW;
+    const scaleY = (container.clientHeight - padding * 2) / svgH;
+    zoom = Math.min(scaleX, scaleY, 3);
+    panX = (container.clientWidth - svgW * zoom) / 2;
+    panY = (container.clientHeight - svgH * zoom) / 2;
+    applyTransform();
+}
 
-    if (artboard) canvas.remove(artboard);
-    const svg = canvas.toSVG();
-    if (artboard) {
-        canvas.add(artboard);
-        canvas.sendObjectToBack(artboard);
-        canvas.renderAll();
-    }
-
-    vscode.postMessage({ type: "svgChanged", svg });
+function applyTransform() {
+    svgPreview.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
 }
 
 function sendScreenshot() {
-    const dataUrl = canvas.toDataURL({ format: "png", multiplier: 1 });
-    vscode.postMessage({ type: "screenshot", dataUrl });
+    if (!currentSvgString || svgW <= 0 || svgH <= 0) {
+        vscode.postMessage({ type: "screenshot", dataUrl: "" });
+        return;
+    }
+
+    // Render SVG natively via offscreen canvas at 2x for crispness
+    const scale = 2;
+    const w = svgW * scale;
+    const h = svgH * scale;
+
+    const img = new Image();
+    img.onload = () => {
+        const offscreen = document.createElement("canvas");
+        offscreen.width = w;
+        offscreen.height = h;
+        const ctx = offscreen.getContext("2d")!;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        vscode.postMessage({
+            type: "screenshot",
+            dataUrl: offscreen.toDataURL("image/png"),
+        });
+    };
+    img.onerror = () => {
+        vscode.postMessage({ type: "screenshot", dataUrl: "" });
+    };
+    img.src =
+        "data:image/svg+xml;charset=utf-8," +
+        encodeURIComponent(currentSvgString);
 }
 
 init();

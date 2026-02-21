@@ -1,125 +1,13 @@
-import type { Canvas } from "fabric";
-
 interface VsCodeApi {
     postMessage(message: unknown): void;
 }
 
-let isPanning = false;
-let lastPanX = 0;
-let lastPanY = 0;
-let spaceHeld = false;
-
-export function initToolbar(canvas: Canvas, vscode: VsCodeApi) {
+export function initToolbar(vscode: VsCodeApi) {
     // Hide the legacy top toolbar — replaced by floating action bar
     const toolbar = document.getElementById("toolbar")!;
     toolbar.style.display = "none";
 
-    // Build floating action bar
     buildActionBar(vscode);
-
-    const container = document.getElementById("canvas-container")!;
-
-    // Make container focusable so it can receive keyboard events in the VSCode webview iframe
-    container.setAttribute("tabindex", "0");
-    container.style.outline = "none";
-
-    // Auto-focus on load and re-focus when canvas is clicked
-    requestAnimationFrame(() => container.focus());
-    canvas.on("mouse:down", () => {
-        container.focus();
-    });
-
-    // --- Space+drag to pan (Photoshop / Illustrator style) ---
-    const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.code === "Space" && !spaceHeld) {
-            e.preventDefault();
-            e.stopPropagation();
-            spaceHeld = true;
-            canvas.defaultCursor = "grab";
-            canvas.hoverCursor = "grab";
-            canvas.selection = false;
-            // Prevent clicking on objects during pan mode
-            canvas.skipTargetFind = true;
-        }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-        if (e.code === "Space") {
-            e.preventDefault();
-            e.stopPropagation();
-            spaceHeld = false;
-            if (!isPanning) {
-                canvas.defaultCursor = "default";
-                canvas.hoverCursor = "move";
-                canvas.selection = true;
-                canvas.skipTargetFind = false;
-            }
-        }
-    };
-
-    // Listen on container, window, AND document for maximum reliability in VSCode webview
-    container.addEventListener("keydown", handleKeyDown);
-    container.addEventListener("keyup", handleKeyUp);
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-
-    // --- Mouse handlers for panning ---
-    canvas.on("mouse:down", (opt) => {
-        const evt = opt.e as MouseEvent;
-        // Pan with: middle mouse, space+left click, or Alt+left click
-        if (
-            evt.button === 1 ||
-            ((spaceHeld || evt.altKey) && evt.button === 0)
-        ) {
-            isPanning = true;
-            lastPanX = evt.clientX;
-            lastPanY = evt.clientY;
-            canvas.selection = false;
-            canvas.skipTargetFind = true;
-            canvas.defaultCursor = "grabbing";
-            canvas.hoverCursor = "grabbing";
-            canvas.discardActiveObject();
-            evt.preventDefault();
-        }
-    });
-
-    canvas.on("mouse:move", (opt) => {
-        if (!isPanning) return;
-        const evt = opt.e as MouseEvent;
-        const vpt = canvas.viewportTransform!;
-        vpt[4] += evt.clientX - lastPanX;
-        vpt[5] += evt.clientY - lastPanY;
-        lastPanX = evt.clientX;
-        lastPanY = evt.clientY;
-        canvas.requestRenderAll();
-    });
-
-    canvas.on("mouse:up", () => {
-        if (isPanning) {
-            isPanning = false;
-            if (!spaceHeld) {
-                canvas.defaultCursor = "default";
-                canvas.hoverCursor = "move";
-                canvas.selection = true;
-                canvas.skipTargetFind = false;
-            } else {
-                canvas.defaultCursor = "grab";
-                canvas.hoverCursor = "grab";
-            }
-        }
-    });
-
-    // Scroll wheel / trackpad pinch to zoom (zoom toward cursor)
-    canvas.on("mouse:wheel", (opt) => {
-        const evt = opt.e as WheelEvent;
-        const delta = evt.deltaY;
-        let zoom = canvas.getZoom();
-        zoom *= 0.999 ** delta;
-        zoom = Math.min(Math.max(zoom, 0.1), 20);
-        canvas.zoomToPoint({ x: evt.offsetX, y: evt.offsetY }, zoom);
-        evt.preventDefault();
-        evt.stopPropagation();
-    });
 }
 
 // ── Floating action bar ──────────────────────────────────────────────

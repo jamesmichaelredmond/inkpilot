@@ -17,7 +17,6 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
 
     // ── Manual panel (MCP create-from-scratch, no file yet) ──
     private manualPanel: vscode.WebviewPanel | null = null;
-    private manualSuppressSync = false;
 
     // ── Shared ──
     private screenshotResolvers: Array<(dataUrl: string) => void> = [];
@@ -77,9 +76,6 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
         const msgDisposable = webviewPanel.webview.onDidReceiveMessage(
             (message) => {
                 switch (message.type) {
-                    case "svgChanged":
-                        this.handleWebviewChange(instance, message.svg);
-                        break;
                     case "screenshot": {
                         const resolver = this.screenshotResolvers.shift();
                         if (resolver) resolver(message.dataUrl);
@@ -135,15 +131,6 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
             viewStateDisposable.dispose();
             docChangeDisposable.dispose();
         });
-    }
-
-    /** Webview user edit → update SvgDocument + apply WorkspaceEdit to TextDocument. */
-    private async handleWebviewChange(
-        instance: EditorInstance,
-        svgMarkup: string
-    ): Promise<void> {
-        instance.svgDoc.set(svgMarkup);
-        await this.applyEditToDocument(instance);
     }
 
     /** Flush the current SvgDocument state into the backing TextDocument. */
@@ -217,11 +204,6 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
         this.manualPanel.webview.onDidReceiveMessage(
             (message) => {
                 switch (message.type) {
-                    case "svgChanged":
-                        this.manualSuppressSync = true;
-                        this.manualSvgDoc.set(message.svg);
-                        this.manualSuppressSync = false;
-                        break;
                     case "screenshot": {
                         const resolver = this.screenshotResolvers.shift();
                         if (resolver) resolver(message.dataUrl);
@@ -288,7 +270,7 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
             }
         }
 
-        if (this.manualPanel && !this.manualSuppressSync) {
+        if (this.manualPanel) {
             this.pushToManualPanel();
         }
     }
@@ -363,9 +345,8 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
     <div id="toolbar"></div>
     <div id="main">
       <div id="canvas-container">
-        <canvas id="canvas"></canvas>
+        <img id="svg-preview" alt="">
       </div>
-      <div id="properties-panel"></div>
     </div>
   </div>
   <script nonce="${nonce}" src="${scriptUri}"></script>
