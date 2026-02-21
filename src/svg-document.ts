@@ -1,127 +1,199 @@
-import { parseHTML } from 'linkedom';
-import { EventEmitter } from 'events';
+import { DOMParser } from "linkedom";
+import { EventEmitter } from "events";
 
-const SVG_NS = 'http://www.w3.org/2000/svg';
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+/** Tags that are structural/non-visual and should not get auto-generated IDs. */
+const STRUCTURAL_TAGS = new Set([
+    "defs",
+    "desc",
+    "title",
+    "metadata",
+    "symbol",
+    "linearGradient",
+    "radialGradient",
+    "stop",
+    "clipPath",
+    "mask",
+    "pattern",
+    "filter",
+    "feBlend",
+    "feColorMatrix",
+    "feComponentTransfer",
+    "feComposite",
+    "feConvolveMatrix",
+    "feDiffuseLighting",
+    "feDisplacementMap",
+    "feFlood",
+    "feGaussianBlur",
+    "feImage",
+    "feMerge",
+    "feMergeNode",
+    "feMorphology",
+    "feOffset",
+    "feSpecularLighting",
+    "feTile",
+    "feTurbulence",
+]);
 
 export interface SvgElementInfo {
-  id: string;
-  tag: string;
-  attributes: Record<string, string>;
+    id: string;
+    tag: string;
+    attributes: Record<string, string>;
 }
 
 export class SvgDocument extends EventEmitter {
-  private doc: ReturnType<typeof parseHTML>['document'] | null = null;
-  private idCounter = 0;
+    private parser = new DOMParser();
+    private doc: ReturnType<DOMParser["parseFromString"]> | null = null;
+    private idCounter = 0;
 
-  get isEmpty(): boolean {
-    return this.doc === null || !this.doc.querySelector('svg');
-  }
+    /** Path to the current .mcpsvg project file (null if unsaved). */
+    projectPath: string | null = null;
+    /** Friendly name for the project. */
+    projectName = "Untitled";
 
-  create(svgMarkup: string): void {
-    const cleaned = svgMarkup.replace(/<\?xml[^?]*\?>\s*/g, '');
-    const { document } = parseHTML(cleaned);
-    this.doc = document;
-    this.ensureIds();
-    this.emit('change', this.getSvg());
-  }
-
-  set(svgMarkup: string): void {
-    this.create(svgMarkup);
-  }
-
-  getSvg(): string {
-    if (!this.doc) return '';
-    const svgEl = this.doc.querySelector('svg');
-    return svgEl ? svgEl.outerHTML : '';
-  }
-
-  addElement(tag: string, attributes: Record<string, string>): string {
-    if (!this.doc || !this.doc.querySelector('svg')) {
-      this.create(
-        '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"></svg>',
-      );
-    }
-    const svgEl = this.doc!.querySelector('svg')!;
-    const el = this.doc!.createElementNS(SVG_NS, tag);
-
-    const id = attributes.id || this.generateId();
-    el.setAttribute('id', id);
-
-    for (const [key, value] of Object.entries(attributes)) {
-      if (key !== 'id') {
-        el.setAttribute(key, value);
-      }
+    get isEmpty(): boolean {
+        return this.doc === null || !this.doc.querySelector("svg");
     }
 
-    svgEl.appendChild(el);
-    this.emit('change', this.getSvg());
-    return id;
-  }
-
-  updateElement(id: string, attributes: Record<string, string>): boolean {
-    if (!this.doc) return false;
-    const el = this.doc.getElementById(id);
-    if (!el) return false;
-
-    for (const [key, value] of Object.entries(attributes)) {
-      if (value === '') {
-        el.removeAttribute(key);
-      } else {
-        el.setAttribute(key, value);
-      }
+    setProject(path: string, name?: string): void {
+        this.projectPath = path;
+        if (name) this.projectName = name;
     }
 
-    this.emit('change', this.getSvg());
-    return true;
-  }
+    clearProject(): void {
+        this.projectPath = null;
+        this.projectName = "Untitled";
+    }
 
-  removeElement(id: string): boolean {
-    if (!this.doc) return false;
-    const el = this.doc.getElementById(id);
-    if (!el) return false;
-    el.parentNode?.removeChild(el);
-    this.emit('change', this.getSvg());
-    return true;
-  }
+    create(svgMarkup: string): void {
+        const cleaned = svgMarkup.replace(/<\?xml[^?]*\?>\s*/g, "");
+        this.doc = this.parser.parseFromString(cleaned, "image/svg+xml");
+        this.ensureIds();
+        this.emit("change", this.getSvg());
+    }
 
-  listElements(): SvgElementInfo[] {
-    if (!this.doc) return [];
-    const svgEl = this.doc.querySelector('svg');
-    if (!svgEl) return [];
+    set(svgMarkup: string): void {
+        this.create(svgMarkup);
+    }
 
-    const elements: SvgElementInfo[] = [];
-    const children = svgEl.querySelectorAll('*');
+    getSvg(): string {
+        if (!this.doc) return "";
+        const svgEl = this.doc.querySelector("svg");
+        return svgEl ? svgEl.outerHTML : "";
+    }
 
-    for (const child of children) {
-      const attrs: Record<string, string> = {};
-      if ((child as any).attributes) {
-        for (const attr of (child as any).attributes) {
-          attrs[attr.name] = attr.value;
+    addElement(tag: string, attributes: Record<string, string>): string {
+        if (!this.doc || !this.doc.querySelector("svg")) {
+            this.create(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"></svg>'
+            );
         }
-      }
-      elements.push({
-        id: (child as any).id || '',
-        tag: child.tagName.toLowerCase(),
-        attributes: attrs,
-      });
+        const svgEl = this.doc!.querySelector("svg")!;
+        const el = this.doc!.createElementNS(SVG_NS, tag, null);
+
+        const id = attributes.id || this.generateId();
+        el.setAttribute("id", id);
+
+        for (const [key, value] of Object.entries(attributes)) {
+            if (key !== "id") {
+                el.setAttribute(key, value);
+            }
+        }
+
+        svgEl.appendChild(el);
+        this.emit("change", this.getSvg());
+        return id;
     }
 
-    return elements;
-  }
+    updateElement(id: string, attributes: Record<string, string>): boolean {
+        if (!this.doc) return false;
+        const el = this.doc.getElementById(id);
+        if (!el) return false;
 
-  private generateId(): string {
-    return `mcpsvg-${++this.idCounter}`;
-  }
+        for (const [key, value] of Object.entries(attributes)) {
+            if (value === "") {
+                el.removeAttribute(key);
+            } else {
+                el.setAttribute(key, value);
+            }
+        }
 
-  private ensureIds(): void {
-    if (!this.doc) return;
-    const svgEl = this.doc.querySelector('svg');
-    if (!svgEl) return;
-
-    for (const child of svgEl.querySelectorAll('*')) {
-      if (!(child as any).id) {
-        (child as any).id = this.generateId();
-      }
+        this.emit("change", this.getSvg());
+        return true;
     }
-  }
+
+    removeElement(id: string): boolean {
+        if (!this.doc) return false;
+        const el = this.doc.getElementById(id);
+        if (!el) return false;
+        el.parentNode?.removeChild(el);
+        this.emit("change", this.getSvg());
+        return true;
+    }
+
+    listElements(): SvgElementInfo[] {
+        if (!this.doc) return [];
+        const svgEl = this.doc.querySelector("svg");
+        if (!svgEl) return [];
+
+        const elements: SvgElementInfo[] = [];
+        const children = svgEl.querySelectorAll("*");
+
+        for (const child of children) {
+            const attrs: Record<string, string> = {};
+            if ((child as any).attributes) {
+                for (const attr of (child as any).attributes) {
+                    attrs[attr.name] = attr.value;
+                }
+            }
+            elements.push({
+                id: (child as any).id || "",
+                tag: child.tagName,
+                attributes: attrs,
+            });
+        }
+
+        return elements;
+    }
+
+    /** Serialize current state into .mcpsvg project JSON. */
+    toProjectJson(name?: string): string {
+        return JSON.stringify(
+            {
+                mcpsvg: "0.1.0",
+                name: name ?? this.projectName,
+                svg: this.getSvg(),
+            },
+            null,
+            2
+        );
+    }
+
+    /** Parse .mcpsvg project JSON and load the SVG. Returns the project name. */
+    static fromProjectJson(json: string): { svg: string; name: string } | null {
+        try {
+            const project = JSON.parse(json) as { name?: string; svg?: string };
+            if (!project.svg) return null;
+            return { svg: project.svg, name: project.name || "Untitled" };
+        } catch {
+            return null;
+        }
+    }
+
+    private generateId(): string {
+        return `mcpsvg-${++this.idCounter}`;
+    }
+
+    private ensureIds(): void {
+        if (!this.doc) return;
+        const svgEl = this.doc.querySelector("svg");
+        if (!svgEl) return;
+
+        for (const child of svgEl.querySelectorAll("*")) {
+            if (!(child as any).id && !STRUCTURAL_TAGS.has(child.tagName)) {
+                (child as any).id = this.generateId();
+            }
+        }
+    }
 }

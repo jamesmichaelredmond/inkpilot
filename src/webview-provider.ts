@@ -1,111 +1,354 @@
-import * as vscode from 'vscode';
-import type { SvgDocument } from './svg-document';
+import * as vscode from "vscode";
+import { SvgDocument } from "./svg-document";
 
-export class SvgEditorProvider {
-  private panel: vscode.WebviewPanel | null = null;
-  private isUpdatingFromWebview = false;
-  private screenshotResolvers: Array<(dataUrl: string) => void> = [];
+/** Per-custom-editor state. */
+interface EditorInstance {
+    document: vscode.TextDocument;
+    panel: vscode.WebviewPanel;
+    svgDoc: SvgDocument;
+    /** When true, suppress onDidChangeTextDocument handler (we caused the edit). */
+    suppressSync: boolean;
+}
 
-  constructor(
-    private context: vscode.ExtensionContext,
-    private svgDocument: SvgDocument,
-  ) {}
+export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
+    // ── Custom editor instances (file-backed .mcpsvg) ──
+    private editors = new Map<string, EditorInstance>();
+    private activeEditorUri: string | null = null;
 
-  openEditor() {
-    if (this.panel) {
-      this.panel.reveal();
-      return;
-    }
+    // ── Manual panel (MCP create-from-scratch, no file yet) ──
+    private manualPanel: vscode.WebviewPanel | null = null;
+    private manualSuppressSync = false;
 
-    this.panel = vscode.window.createWebviewPanel(
-      'mcpsvg.editor',
-      'mcpsvg Editor',
-      vscode.ViewColumn.Beside,
-      {
-        enableScripts: true,
-        retainContextWhenHidden: true,
-        localResourceRoots: [
-          vscode.Uri.joinPath(this.context.extensionUri, 'dist'),
-        ],
-      },
-    );
+    // ── Shared ──
+    private screenshotResolvers: Array<(dataUrl: string) => void> = [];
 
-    this.panel.webview.html = this.getHtml(this.panel.webview);
+    constructor(
+        private extensionContext: vscode.ExtensionContext,
+        /** Singleton SvgDocument used by the manual (non-file) panel. */
+        private manualSvgDoc: SvgDocument
+    ) {}
 
-    // Handle messages from webview
-    this.panel.webview.onDidReceiveMessage(
-      (message) => {
-        switch (message.type) {
-          case 'svgChanged':
-            this.isUpdatingFromWebview = true;
-            this.svgDocument.set(message.svg);
-            this.isUpdatingFromWebview = false;
-            break;
-          case 'screenshot': {
-            const resolver = this.screenshotResolvers.shift();
-            if (resolver) {
-              resolver(message.dataUrl);
+    // ═══════════════════════════════════════════════════════════════════
+    //  CustomTextEditorProvider — VS Code calls this for .mcpsvg files
+    // ═══════════════════════════════════════════════════════════════════
+
+    resolveCustomTextEditor(
+        document: vscode.TextDocument,
+        webviewPanel: vscode.WebviewPanel,
+        _token: vscode.CancellationToken
+    ): void {
+        const uri = document.uri.toString();
+        const svgDoc = new SvgDocument();
+
+        // Parse initial content
+        const project = SvgDocument.fromProjectJson(document.getText());
+        if (project) {
+            svgDoc.create(project.svg);
+        }
+
+        const instance: EditorInstance = {
+            document,
+            panel: webviewPanel,
+            svgDoc,
+            suppressSync: false,
+        };
+
+        this.editors.set(uri, instance);
+        this.activeEditorUri = uri;
+
+        // Setup webview
+        webviewPanel.webview.options = {
+            enableScripts: true,
+            localResourceRoots: [
+                vscode.Uri.joinPath(this.extensionContext.extensionUri, "dist"),
+            ],
+        };
+        webviewPanel.webview.html = this.getHtml(webviewPanel.webview);
+
+        // Send initial SVG after webview loads
+        const svg = svgDoc.getSvg();
+        if (svg) {
+            setTimeout(() => {
+                webviewPanel.webview.postMessage({ type: "updateSvg", svg });
+            }, 100);
+        }
+
+        // Handle messages from webview
+        const msgDisposable = webviewPanel.webview.onDidReceiveMessage(
+            (message) => {
+                switch (message.type) {
+                    case "svgChanged":
+                        this.handleWebviewChange(instance, message.svg);
+                        break;
+                    case "screenshot": {
+                        const resolver = this.screenshotResolvers.shift();
+                        if (resolver) resolver(message.dataUrl);
+                        break;
+                    }
+                    case "save":
+                        vscode.commands.executeCommand(
+                            "workbench.action.files.save"
+                        );
+                        break;
+                    case "export":
+                        vscode.commands.executeCommand("mcpsvg.exportSvg");
+                        break;
+                }
             }
-            break;
-          }
+        );
+
+        // Track which editor is active
+        const viewStateDisposable = webviewPanel.onDidChangeViewState(() => {
+            if (webviewPanel.active) {
+                this.activeEditorUri = uri;
+            }
+        });
+
+        // Listen for external document changes (undo, redo, other edits)
+        const docChangeDisposable = vscode.workspace.onDidChangeTextDocument(
+            (e) => {
+                if (e.document.uri.toString() !== uri) return;
+                if (instance.suppressSync) return;
+                if (e.contentChanges.length === 0) return;
+
+                // Re-parse and push to webview
+                const updated = SvgDocument.fromProjectJson(
+                    e.document.getText()
+                );
+                if (updated) {
+                    svgDoc.create(updated.svg);
+                    webviewPanel.webview.postMessage({
+                        type: "updateSvg",
+                        svg: updated.svg,
+                    });
+                }
+            }
+        );
+
+        // Cleanup
+        webviewPanel.onDidDispose(() => {
+            this.editors.delete(uri);
+            if (this.activeEditorUri === uri) {
+                this.activeEditorUri = null;
+            }
+            msgDisposable.dispose();
+            viewStateDisposable.dispose();
+            docChangeDisposable.dispose();
+        });
+    }
+
+    /** Webview user edit → update SvgDocument + apply WorkspaceEdit to TextDocument. */
+    private async handleWebviewChange(
+        instance: EditorInstance,
+        svgMarkup: string
+    ): Promise<void> {
+        instance.svgDoc.set(svgMarkup);
+        await this.applyEditToDocument(instance);
+    }
+
+    /** Flush the current SvgDocument state into the backing TextDocument. */
+    private async applyEditToDocument(instance: EditorInstance): Promise<void> {
+        const { document, svgDoc } = instance;
+        const svg = svgDoc.getSvg();
+
+        // Read current project JSON (preserve name, version, etc.)
+        let project: Record<string, unknown> = {};
+        try {
+            project = JSON.parse(document.getText());
+        } catch {
+            project = { mcpsvg: "0.1.0", name: "Untitled" };
         }
-      },
-      undefined,
-      this.context.subscriptions,
-    );
+        project.svg = svg;
 
-    this.panel.onDidDispose(() => {
-      this.panel = null;
-      // Reject any pending screenshot requests
-      for (const resolver of this.screenshotResolvers) {
-        resolver('');
-      }
-      this.screenshotResolvers = [];
-    });
+        const newText = JSON.stringify(project, null, 2);
+        if (newText === document.getText()) return; // no change
 
-    // Send current SVG if it exists
-    if (!this.svgDocument.isEmpty) {
-      this.updateWebview();
+        const edit = new vscode.WorkspaceEdit();
+        edit.replace(
+            document.uri,
+            new vscode.Range(0, 0, document.lineCount, 0),
+            newText
+        );
+
+        instance.suppressSync = true;
+        await vscode.workspace.applyEdit(edit);
+        instance.suppressSync = false;
     }
-  }
 
-  updateWebview() {
-    if (this.panel && !this.isUpdatingFromWebview) {
-      this.panel.webview.postMessage({
-        type: 'updateSvg',
-        svg: this.svgDocument.getSvg(),
-      });
-    }
-  }
+    // ═══════════════════════════════════════════════════════════════════
+    //  Manual panel — MCP create-from-scratch workflow (no file yet)
+    // ═══════════════════════════════════════════════════════════════════
 
-  async requestScreenshot(): Promise<string> {
-    if (!this.panel) {
-      throw new Error('Editor is not open. Use svg_create or open the editor first.');
-    }
-    return new Promise<string>((resolve) => {
-      this.screenshotResolvers.push(resolve);
-      this.panel!.webview.postMessage({ type: 'requestScreenshot' });
-      // Timeout after 5 seconds
-      setTimeout(() => {
-        const idx = this.screenshotResolvers.indexOf(resolve);
-        if (idx !== -1) {
-          this.screenshotResolvers.splice(idx, 1);
-          resolve('');
+    openEditor(): void {
+        // If a custom editor is active, just reveal it
+        if (this.activeEditorUri) {
+            const instance = this.editors.get(this.activeEditorUri);
+            if (instance) {
+                instance.panel.reveal();
+                return;
+            }
         }
-      }, 5000);
-    });
-  }
 
-  private getHtml(webview: vscode.Webview): string {
-    const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'webview.js'),
-    );
-    const stylesUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'webview.css'),
-    );
-    const nonce = getNonce();
+        if (this.manualPanel) {
+            this.manualPanel.reveal();
+            return;
+        }
 
-    return `<!DOCTYPE html>
+        this.manualPanel = vscode.window.createWebviewPanel(
+            "mcpsvg.editor",
+            "mcpsvg Editor",
+            vscode.ViewColumn.Beside,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+                localResourceRoots: [
+                    vscode.Uri.joinPath(
+                        this.extensionContext.extensionUri,
+                        "dist"
+                    ),
+                ],
+            }
+        );
+
+        this.activeEditorUri = null; // null = manual panel is active
+
+        this.manualPanel.webview.html = this.getHtml(this.manualPanel.webview);
+
+        this.manualPanel.webview.onDidReceiveMessage(
+            (message) => {
+                switch (message.type) {
+                    case "svgChanged":
+                        this.manualSuppressSync = true;
+                        this.manualSvgDoc.set(message.svg);
+                        this.manualSuppressSync = false;
+                        break;
+                    case "screenshot": {
+                        const resolver = this.screenshotResolvers.shift();
+                        if (resolver) resolver(message.dataUrl);
+                        break;
+                    }
+                    case "save":
+                        vscode.commands.executeCommand("mcpsvg.saveProject");
+                        break;
+                    case "export":
+                        vscode.commands.executeCommand("mcpsvg.exportSvg");
+                        break;
+                }
+            },
+            undefined,
+            this.extensionContext.subscriptions
+        );
+
+        this.manualPanel.onDidDispose(() => {
+            this.manualPanel = null;
+            for (const resolver of this.screenshotResolvers) resolver("");
+            this.screenshotResolvers = [];
+        });
+
+        // Send current SVG if available
+        if (!this.manualSvgDoc.isEmpty) {
+            this.pushToManualPanel();
+        }
+    }
+
+    private pushToManualPanel(): void {
+        if (this.manualPanel) {
+            this.manualPanel.webview.postMessage({
+                type: "updateSvg",
+                svg: this.manualSvgDoc.getSvg(),
+            });
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  Public API — used by MCP context wiring in extension.ts
+    // ═══════════════════════════════════════════════════════════════════
+
+    /** Get the SvgDocument for the currently active editor (custom or manual). */
+    getActiveSvgDocument(): SvgDocument {
+        if (this.activeEditorUri) {
+            const instance = this.editors.get(this.activeEditorUri);
+            if (instance) return instance.svgDoc;
+        }
+        return this.manualSvgDoc;
+    }
+
+    /**
+     * Push current SVG state to the active webview.
+     * For custom editors, also syncs the change into the TextDocument.
+     */
+    updateWebview(): void {
+        if (this.activeEditorUri) {
+            const instance = this.editors.get(this.activeEditorUri);
+            if (instance) {
+                const svg = instance.svgDoc.getSvg();
+                instance.panel.webview.postMessage({ type: "updateSvg", svg });
+                this.applyEditToDocument(instance);
+                return;
+            }
+        }
+
+        if (this.manualPanel && !this.manualSuppressSync) {
+            this.pushToManualPanel();
+        }
+    }
+
+    /** Get the active custom editor's TextDocument URI, if any. */
+    getActiveDocumentUri(): vscode.Uri | null {
+        if (this.activeEditorUri) {
+            const instance = this.editors.get(this.activeEditorUri);
+            if (instance) return instance.document.uri;
+        }
+        return null;
+    }
+
+    async requestScreenshot(): Promise<string> {
+        let panel: vscode.WebviewPanel | null = null;
+        if (this.activeEditorUri) {
+            panel = this.editors.get(this.activeEditorUri)?.panel ?? null;
+        }
+        if (!panel) panel = this.manualPanel;
+        if (!panel) {
+            throw new Error(
+                "Editor is not open. Use svg_create or open the editor first."
+            );
+        }
+
+        return new Promise<string>((resolve) => {
+            this.screenshotResolvers.push(resolve);
+            panel!.webview.postMessage({ type: "requestScreenshot" });
+            setTimeout(() => {
+                const idx = this.screenshotResolvers.indexOf(resolve);
+                if (idx !== -1) {
+                    this.screenshotResolvers.splice(idx, 1);
+                    resolve("");
+                }
+            }, 5000);
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  Webview HTML — shared by both paths
+    // ═══════════════════════════════════════════════════════════════════
+
+    private getHtml(webview: vscode.Webview): string {
+        const scriptUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(
+                this.extensionContext.extensionUri,
+                "dist",
+                "webview.js"
+            )
+        );
+        const stylesUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(
+                this.extensionContext.extensionUri,
+                "dist",
+                "webview.css"
+            )
+        );
+        const nonce = getNonce();
+
+        return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -128,14 +371,15 @@ export class SvgEditorProvider {
   <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`;
-  }
+    }
 }
 
 function getNonce(): string {
-  let text = '';
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < 32; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  }
-  return text;
+    let text = "";
+    const possible =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (let i = 0; i < 32; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
 }

@@ -1,156 +1,173 @@
-import type { Canvas } from 'fabric';
+import type { Canvas } from "fabric";
 
-type ToolMode = 'pointer' | 'pan';
+interface VsCodeApi {
+    postMessage(message: unknown): void;
+}
 
-let currentMode: ToolMode = 'pointer';
 let isPanning = false;
 let lastPanX = 0;
 let lastPanY = 0;
+let spaceHeld = false;
 
-export function initToolbar(canvas: Canvas) {
-  const toolbar = document.getElementById('toolbar')!;
+export function initToolbar(canvas: Canvas, vscode: VsCodeApi) {
+    // Hide the legacy top toolbar — replaced by floating action bar
+    const toolbar = document.getElementById("toolbar")!;
+    toolbar.style.display = "none";
 
-  // Pointer tool
-  const pointerBtn = createButton('pointer', 'Pointer (V)', true);
-  pointerBtn.addEventListener('click', () => {
-    setMode('pointer', canvas);
-    setActive(pointerBtn);
-  });
+    // Build floating action bar
+    buildActionBar(vscode);
 
-  // Pan tool
-  const panBtn = createButton('pan', 'Pan (H)');
-  panBtn.addEventListener('click', () => {
-    setMode('pan', canvas);
-    setActive(panBtn);
-  });
+    const container = document.getElementById("canvas-container")!;
 
-  // Zoom in
-  const zoomInBtn = createButton('zoom-in', 'Zoom In (+)');
-  zoomInBtn.addEventListener('click', () => {
-    const zoom = canvas.getZoom() * 1.2;
-    canvas.setZoom(Math.min(zoom, 10));
-    canvas.renderAll();
-  });
+    // Make container focusable so it can receive keyboard events in the VSCode webview iframe
+    container.setAttribute("tabindex", "0");
+    container.style.outline = "none";
 
-  // Zoom out
-  const zoomOutBtn = createButton('zoom-out', 'Zoom Out (-)');
-  zoomOutBtn.addEventListener('click', () => {
-    const zoom = canvas.getZoom() / 1.2;
-    canvas.setZoom(Math.max(zoom, 0.1));
-    canvas.renderAll();
-  });
+    // Auto-focus on load and re-focus when canvas is clicked
+    requestAnimationFrame(() => container.focus());
+    canvas.on("mouse:down", () => {
+        container.focus();
+    });
 
-  // Zoom reset
-  const zoomResetBtn = createButton('zoom-reset', 'Reset Zoom (0)');
-  zoomResetBtn.addEventListener('click', () => {
-    canvas.setZoom(1);
-    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
-    canvas.renderAll();
-  });
+    // --- Space+drag to pan (Photoshop / Illustrator style) ---
+    const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.code === "Space" && !spaceHeld) {
+            e.preventDefault();
+            e.stopPropagation();
+            spaceHeld = true;
+            canvas.defaultCursor = "grab";
+            canvas.hoverCursor = "grab";
+            canvas.selection = false;
+            // Prevent clicking on objects during pan mode
+            canvas.skipTargetFind = true;
+        }
+    };
 
-  toolbar.append(pointerBtn, panBtn, zoomInBtn, zoomOutBtn, zoomResetBtn);
+    const handleKeyUp = (e: KeyboardEvent) => {
+        if (e.code === "Space") {
+            e.preventDefault();
+            e.stopPropagation();
+            spaceHeld = false;
+            if (!isPanning) {
+                canvas.defaultCursor = "default";
+                canvas.hoverCursor = "move";
+                canvas.selection = true;
+                canvas.skipTargetFind = false;
+            }
+        }
+    };
 
-  // Pan mode mouse handlers
-  canvas.on('mouse:down', (opt) => {
-    if (currentMode === 'pan') {
-      isPanning = true;
-      const evt = opt.e as MouseEvent;
-      lastPanX = evt.clientX;
-      lastPanY = evt.clientY;
-      canvas.selection = false;
-    }
-  });
+    // Listen on container, window, AND document for maximum reliability in VSCode webview
+    container.addEventListener("keydown", handleKeyDown);
+    container.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
-  canvas.on('mouse:move', (opt) => {
-    if (isPanning && currentMode === 'pan') {
-      const evt = opt.e as MouseEvent;
-      const vpt = canvas.viewportTransform!;
-      vpt[4] += evt.clientX - lastPanX;
-      vpt[5] += evt.clientY - lastPanY;
-      lastPanX = evt.clientX;
-      lastPanY = evt.clientY;
-      canvas.requestRenderAll();
-    }
-  });
+    // --- Mouse handlers for panning ---
+    canvas.on("mouse:down", (opt) => {
+        const evt = opt.e as MouseEvent;
+        // Pan with: middle mouse, space+left click, or Alt+left click
+        if (
+            evt.button === 1 ||
+            ((spaceHeld || evt.altKey) && evt.button === 0)
+        ) {
+            isPanning = true;
+            lastPanX = evt.clientX;
+            lastPanY = evt.clientY;
+            canvas.selection = false;
+            canvas.skipTargetFind = true;
+            canvas.defaultCursor = "grabbing";
+            canvas.hoverCursor = "grabbing";
+            canvas.discardActiveObject();
+            evt.preventDefault();
+        }
+    });
 
-  canvas.on('mouse:up', () => {
-    isPanning = false;
-  });
+    canvas.on("mouse:move", (opt) => {
+        if (!isPanning) return;
+        const evt = opt.e as MouseEvent;
+        const vpt = canvas.viewportTransform!;
+        vpt[4] += evt.clientX - lastPanX;
+        vpt[5] += evt.clientY - lastPanY;
+        lastPanX = evt.clientX;
+        lastPanY = evt.clientY;
+        canvas.requestRenderAll();
+    });
 
-  // Scroll wheel zoom
-  canvas.on('mouse:wheel', (opt) => {
-    const evt = opt.e as WheelEvent;
-    const delta = evt.deltaY;
-    let zoom = canvas.getZoom();
-    zoom *= 0.999 ** delta;
-    zoom = Math.min(Math.max(zoom, 0.1), 10);
-    canvas.zoomToPoint({ x: evt.offsetX, y: evt.offsetY }, zoom);
-    evt.preventDefault();
-    evt.stopPropagation();
-  });
+    canvas.on("mouse:up", () => {
+        if (isPanning) {
+            isPanning = false;
+            if (!spaceHeld) {
+                canvas.defaultCursor = "default";
+                canvas.hoverCursor = "move";
+                canvas.selection = true;
+                canvas.skipTargetFind = false;
+            } else {
+                canvas.defaultCursor = "grab";
+                canvas.hoverCursor = "grab";
+            }
+        }
+    });
 
-  // Keyboard shortcuts
-  document.addEventListener('keydown', (e) => {
-    if ((e.target as HTMLElement).tagName === 'INPUT') return;
-    switch (e.key.toLowerCase()) {
-      case 'v':
-        setMode('pointer', canvas);
-        setActive(pointerBtn);
-        break;
-      case 'h':
-        setMode('pan', canvas);
-        setActive(panBtn);
-        break;
-      case '=':
-      case '+':
-        zoomInBtn.click();
-        break;
-      case '-':
-        zoomOutBtn.click();
-        break;
-      case '0':
-        zoomResetBtn.click();
-        break;
-    }
-  });
+    // Scroll wheel / trackpad pinch to zoom (zoom toward cursor)
+    canvas.on("mouse:wheel", (opt) => {
+        const evt = opt.e as WheelEvent;
+        const delta = evt.deltaY;
+        let zoom = canvas.getZoom();
+        zoom *= 0.999 ** delta;
+        zoom = Math.min(Math.max(zoom, 0.1), 20);
+        canvas.zoomToPoint({ x: evt.offsetX, y: evt.offsetY }, zoom);
+        evt.preventDefault();
+        evt.stopPropagation();
+    });
 }
 
-function setMode(mode: ToolMode, canvas: Canvas) {
-  currentMode = mode;
-  if (mode === 'pointer') {
-    canvas.selection = true;
-    canvas.defaultCursor = 'default';
-    canvas.hoverCursor = 'move';
-  } else {
-    canvas.selection = false;
-    canvas.defaultCursor = 'grab';
-    canvas.hoverCursor = 'grab';
-    canvas.discardActiveObject();
-    canvas.renderAll();
-  }
+// ── Floating action bar ──────────────────────────────────────────────
+
+const SAVE_ICON = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12.5 14H3.5C3.10218 14 2.72064 13.842 2.43934 13.5607C2.15804 13.2794 2 12.8978 2 12.5V3.5C2 3.10218 2.15804 2.72064 2.43934 2.43934C2.72064 2.15804 3.10218 2 3.5 2H10.5L14 5.5V12.5C14 12.8978 13.842 13.2794 13.5607 13.5607C13.2794 13.842 12.8978 14 12.5 14Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M11 14V9H5V14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M5 2V5.5H9.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
+const EXPORT_ICON = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M14 10V12.5C14 12.8978 13.842 13.2794 13.5607 13.5607C13.2794 13.842 12.8978 14 12.5 14H3.5C3.10218 14 2.72064 13.842 2.43934 13.5607C2.15804 13.2794 2 12.8978 2 12.5V10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M5 6.5L8 3.5L11 6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M8 3.5V10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
+function buildActionBar(vscode: VsCodeApi) {
+    const container = document.getElementById("canvas-container")!;
+
+    const bar = document.createElement("div");
+    bar.className = "action-bar";
+
+    bar.appendChild(
+        makeActionBtn(SAVE_ICON, "Save Project", () =>
+            vscode.postMessage({ type: "save" })
+        )
+    );
+    bar.appendChild(
+        makeActionBtn(EXPORT_ICON, "Export SVG", () =>
+            vscode.postMessage({ type: "export" })
+        )
+    );
+
+    container.appendChild(bar);
 }
 
-function createButton(id: string, title: string, active = false): HTMLButtonElement {
-  const btn = document.createElement('button');
-  btn.id = `tool-${id}`;
-  btn.className = `toolbar-btn${active ? ' active' : ''}`;
-  btn.title = title;
-  btn.textContent = getIcon(id);
-  return btn;
-}
-
-function setActive(btn: HTMLButtonElement) {
-  document.querySelectorAll('.toolbar-btn').forEach((b) => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-function getIcon(id: string): string {
-  switch (id) {
-    case 'pointer': return '\u25E6'; // pointer
-    case 'pan': return '\u2630';     // pan
-    case 'zoom-in': return '+';
-    case 'zoom-out': return '\u2212';
-    case 'zoom-reset': return '\u2316';
-    default: return '?';
-  }
+function makeActionBtn(
+    iconHtml: string,
+    title: string,
+    onClick: () => void
+): HTMLButtonElement {
+    const btn = document.createElement("button");
+    btn.className = "action-btn";
+    btn.title = title;
+    btn.innerHTML = iconHtml;
+    btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        onClick();
+    });
+    return btn;
 }

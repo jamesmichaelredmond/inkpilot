@@ -1,66 +1,128 @@
 {
-  "name": "mcpsvg",
-  "displayName": "mcpsvg",
-  "description": "AI-Powered SVG Editor for VSCode via MCP",
-  "version": "0.1.0",
-  "publisher": "mcpsvg",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mcpsvg/mcpsvg"
-  },
-  "engines": {
-    "vscode": "^1.85.0"
-  },
-  "categories": [
-    "Visualization",
-    "Other"
-  ],
-  "activationEvents": [],
-  "main": "./dist/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "mcpsvg.openEditor",
-        "title": "mcpsvg: Open SVG Editor"
-      },
-      {
-        "command": "mcpsvg.startServer",
-        "title": "mcpsvg: Start MCP Server"
-      }
+    "name": "mcpsvg",
+    "displayName": "mcpsvg",
+    "description": "AI-Powered SVG Editor for VSCode via MCP",
+    "version": "0.1.0",
+    "publisher": "mcpsvg",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mcpsvg/mcpsvg"
+    },
+    "engines": {
+        "vscode": "^1.99.0"
+    },
+    "categories": [
+        "Visualization",
+        "Other"
     ],
-    "configuration": {
-      "title": "mcpsvg",
-      "properties": {
-        "mcpsvg.port": {
-          "type": "number",
-          "default": 7100,
-          "description": "Port for the MCP SSE server"
-        }
-      }
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "main": "./dist/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "mcpsvg.openEditor",
+                "title": "mcpsvg: Open SVG Editor"
+            },
+            {
+                "command": "mcpsvg.startServer",
+                "title": "mcpsvg: Start MCP Server"
+            },
+            {
+                "command": "mcpsvg.saveProject",
+                "title": "mcpsvg: Save Project"
+            },
+            {
+                "command": "mcpsvg.saveProjectAs",
+                "title": "mcpsvg: Save Project As..."
+            },
+            {
+                "command": "mcpsvg.openProject",
+                "title": "mcpsvg: Open Project"
+            },
+            {
+                "command": "mcpsvg.exportSvg",
+                "title": "mcpsvg: Export SVG"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "mcpsvg.saveProject",
+                "key": "ctrl+s",
+                "mac": "cmd+s",
+                "when": "activeWebviewPanelId == 'mcpsvg.editor' || activeCustomEditorId == 'mcpsvg.svgEditor'"
+            },
+            {
+                "command": "mcpsvg.saveProjectAs",
+                "key": "ctrl+shift+s",
+                "mac": "cmd+shift+s",
+                "when": "activeWebviewPanelId == 'mcpsvg.editor' || activeCustomEditorId == 'mcpsvg.svgEditor'"
+            },
+            {
+                "command": "mcpsvg.openProject",
+                "key": "ctrl+o",
+                "mac": "cmd+o",
+                "when": "activeWebviewPanelId == 'mcpsvg.editor' || activeCustomEditorId == 'mcpsvg.svgEditor'"
+            },
+            {
+                "command": "mcpsvg.exportSvg",
+                "key": "ctrl+e",
+                "mac": "cmd+e",
+                "when": "activeWebviewPanelId == 'mcpsvg.editor' || activeCustomEditorId == 'mcpsvg.svgEditor'"
+            }
+        ],
+        "configuration": {
+            "title": "mcpsvg",
+            "properties": {
+                "mcpsvg.port": {
+                    "type": "number",
+                    "default": 7100,
+                    "description": "Port for the MCP SSE server"
+                }
+            }
+        },
+        "customEditors": [
+            {
+                "viewType": "mcpsvg.svgEditor",
+                "displayName": "mcpsvg SVG Editor",
+                "selector": [
+                    {
+                        "filenamePattern": "*.mcpsvg"
+                    }
+                ],
+                "priority": "default"
+            }
+        ],
+        "mcpServerDefinitionProviders": [
+            {
+                "id": "mcpsvg.mcpServer",
+                "label": "mcpsvg SVG Editor"
+            }
+        ]
+    },
+    "scripts": {
+        "build": "node esbuild.config.mjs",
+        "watch": "node esbuild.config.mjs --watch",
+        "package": "vsce package",
+        "lint": "eslint src/"
+    },
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.11.0",
+        "express": "^4.21.0",
+        "linkedom": "^0.16.0",
+        "zod": "^3.23.0"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.21",
+        "@types/node": "^20.11.0",
+        "@types/vscode": "^1.109.0",
+        "esbuild": "^0.24.0",
+        "fabric": "^6.5.0",
+        "typescript": "^5.5.0"
+    },
+    "optionalDependencies": {
+        "@resvg/resvg-js": "^2.6.0"
     }
-  },
-  "scripts": {
-    "build": "node esbuild.config.mjs",
-    "watch": "node esbuild.config.mjs --watch",
-    "package": "vsce package",
-    "lint": "eslint src/"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.11.0",
-    "express": "^4.21.0",
-    "linkedom": "^0.16.0",
-    "zod": "^3.23.0"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/node": "^20.11.0",
-    "@types/vscode": "^1.85.0",
-    "esbuild": "^0.24.0",
-    "fabric": "^6.5.0",
-    "typescript": "^5.5.0"
-  },
-  "optionalDependencies": {
-    "@resvg/resvg-js": "^2.6.0"
-  }
 }
