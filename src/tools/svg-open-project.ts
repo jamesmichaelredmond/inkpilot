@@ -10,13 +10,10 @@ export function registerSvgOpenProject(
     server.registerTool(
         "svg_open_project",
         {
-            description: "Open an mcpsvg project file (.mcpsvg) and load its SVG into the editor.",
+            description:
+                "Open a .mcpsvg project file and load its SVG into the editor.",
             inputSchema: {
-                path: z
-                    .string()
-                    .describe(
-                        "Absolute file path to the .mcpsvg project file to open"
-                    ),
+                path: z.string().describe("Absolute path to the .mcpsvg file"),
             },
         },
         async ({ path: filePath }) => {

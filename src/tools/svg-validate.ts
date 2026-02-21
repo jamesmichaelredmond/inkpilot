@@ -1,6 +1,4 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { DOMParser } from "linkedom";
-import type { McpServerContext } from "../mcp-server";
 
 export interface ValidationIssue {
     severity: "error" | "warning" | "suggestion";
@@ -48,7 +46,7 @@ export function validateSvg(svgMarkup: string): ValidationIssue[] {
         vbH = 0;
     if (viewBox) {
         const parts = viewBox.split(/[\s,]+/).map(Number);
-        if (parts.length === 4 && parts.every((n) => !isNaN(n))) {
+        if (parts.length === 4 && parts.every((n: number) => !isNaN(n))) {
             [vbX, vbY, vbW, vbH] = parts;
         } else {
             issues.push({
@@ -95,7 +93,7 @@ export function validateSvg(svgMarkup: string): ValidationIssue[] {
             const id = el.getAttribute("id") || tag;
 
             // Skip elements inside transformed groups
-            const parent = el.parentNode as Element | null;
+            const parent = el.parentNode as any;
             if (parent?.tagName === "g" && parent.getAttribute("transform")) {
                 continue;
             }
@@ -191,7 +189,7 @@ export function validateSvg(svgMarkup: string): ValidationIssue[] {
     // 9. Check for unused defs
     if (defs) {
         const definedIds: string[] = [];
-        for (const child of Array.from(defs.children)) {
+        for (const child of Array.from(defs.children) as any[]) {
             const id = child.getAttribute("id");
             if (id) definedIds.push(id);
         }
@@ -244,74 +242,4 @@ export function validateSvg(svgMarkup: string): ValidationIssue[] {
     }
 
     return issues;
-}
-
-export function registerSvgValidate(
-    server: McpServer,
-    context: McpServerContext
-) {
-    server.registerTool(
-        "svg_validate",
-        {
-            description: `Validate the current SVG for common quality issues. Checks for:
-- Missing viewBox or xmlns
-- Text without font-family
-- Elements outside viewBox bounds
-- Gradients/filters outside <defs>
-- Empty groups or unused defs
-- Overlapping elements at same position
-
-Use this after building your SVG to catch issues before exporting. Fix any errors and warnings, then re-validate.`,
-        },
-        async () => {
-            const svg = context.svgDocument.getSvg();
-            if (!svg) {
-                return {
-                    content: [
-                        {
-                            type: "text" as const,
-                            text: "No SVG is currently loaded. Use svg_create first.",
-                        },
-                    ],
-                    isError: true,
-                };
-            }
-
-            const issues = validateSvg(svg);
-
-            if (issues.length === 0) {
-                return {
-                    content: [
-                        {
-                            type: "text" as const,
-                            text: "Validation passed. No issues found. Consider calling svg_screenshot for a visual review.",
-                        },
-                    ],
-                };
-            }
-
-            const errors = issues.filter((i) => i.severity === "error");
-            const warnings = issues.filter((i) => i.severity === "warning");
-            const suggestions = issues.filter(
-                (i) => i.severity === "suggestion"
-            );
-
-            let text = `Found ${issues.length} issue(s):\n\n`;
-            if (errors.length > 0) {
-                text += `ERRORS (must fix):\n${errors.map((i) => `  - ${i.message}`).join("\n")}\n\n`;
-            }
-            if (warnings.length > 0) {
-                text += `WARNINGS (should fix):\n${warnings.map((i) => `  - ${i.message}`).join("\n")}\n\n`;
-            }
-            if (suggestions.length > 0) {
-                text += `SUGGESTIONS (nice to have):\n${suggestions.map((i) => `  - ${i.message}`).join("\n")}\n\n`;
-            }
-            text +=
-                "Fix the issues above using svg_set, then call svg_validate again to confirm.";
-
-            return {
-                content: [{ type: "text" as const, text }],
-            };
-        }
-    );
 }

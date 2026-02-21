@@ -9,34 +9,13 @@ export function registerSvgCreate(
     server.registerTool(
         "svg_create",
         {
-            description: `Create a new SVG and open the visual editor.
-
-Build substantially in this first call — include the SVG root, <defs> with any gradients/filters, background, AND initial structural shapes. Don't create an empty skeleton.
-
-Structure example:
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#e85d04" />
-      <stop offset="100%" stop-color="#dc2f02" />
-    </linearGradient>
-  </defs>
-  <g id="background"><rect id="bg" width="400" height="400" fill="#fefae0" /></g>
-  <g id="main-content"><!-- shapes here --></g>
-</svg>
-
-Then use svg_set to complete the design (add text, details, refinements). Aim for 1-2 svg_set calls total, then svg_validate_and_screenshot.
-
-Key reminders:
-- Give ALL visual elements meaningful id attributes
-- Put gradients/filters/clipPaths inside <defs>
-- Use transform="translate(cx,cy)" on groups to center content
-- For text: ALWAYS use dominant-baseline="central" + text-anchor="middle" + font-family with fallbacks`,
+            description:
+                "Create a new SVG and open the visual editor. Build substantially — include <defs>, background, and initial shapes. Use svg_set to refine, then svg_validate_and_screenshot to review. See svg_get_guidelines for text/typography rules.",
             inputSchema: {
                 markup: z
                     .string()
                     .describe(
-                        "SVG markup string. Must include <svg> with xmlns, viewBox, width, height. Include a <defs> section and background group. Add more content via svg_set calls."
+                        "Complete SVG markup with xmlns, viewBox, width, height, <defs>, and content groups"
                     ),
             },
         },

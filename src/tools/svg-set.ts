@@ -6,23 +6,12 @@ export function registerSvgSet(server: McpServer, context: McpServerContext) {
     server.registerTool(
         "svg_set",
         {
-            description: `Replace the SVG with an updated version. Each call must include ALL previous elements PLUS new additions. The editor updates live.
-
-This should complete the design — include all shapes, text, and details. Aim to finish in 1-2 svg_set calls total.
-
-Critical text rules (the #1 source of SVG bugs):
-- ALWAYS: dominant-baseline="central" (without it, text renders ABOVE its y coordinate)
-- ALWAYS: text-anchor="middle" for centered text
-- ALWAYS: font-family with fallback stack (e.g., "Georgia, 'Times New Roman', serif")
-- Center text in shapes mathematically: text x = shape x + width/2, text y = shape y + height/2
-
-After completing the design, call svg_validate_and_screenshot to review.`,
+            description:
+                "Replace the full SVG markup. Must include ALL previous elements plus additions. Call svg_validate_and_screenshot when done.",
             inputSchema: {
                 markup: z
                     .string()
-                    .describe(
-                        "Complete SVG markup including all elements so far plus new additions"
-                    ),
+                    .describe("Complete SVG markup with all elements"),
             },
         },
         async ({ markup }) => {

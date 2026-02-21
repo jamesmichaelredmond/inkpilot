@@ -11,13 +11,10 @@ export function registerSvgExport(
     server.registerTool(
         "svg_export",
         {
-            description: "Export the current SVG as a standalone .svg file for use in other projects.",
+            description:
+                "Export the current SVG as a standalone .svg file.",
             inputSchema: {
-                path: z
-                    .string()
-                    .describe(
-                        "Absolute file path to write the .svg file (e.g. /home/user/assets/logo.svg)"
-                    ),
+                path: z.string().describe("Absolute path for the .svg file"),
             },
         },
         async ({ path: filePath }) => {

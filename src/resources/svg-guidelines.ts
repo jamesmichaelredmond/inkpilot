@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 export const SVG_GUIDELINES_URI = "mcpsvg://guidelines/svg-design";
 
-const SVG_DESIGN_GUIDELINES = `# SVG Design Guidelines for mcpsvg
+export const SVG_DESIGN_GUIDELINES = `# SVG Design Guidelines for mcpsvg
 
 ## 1. SVG Structure
 
@@ -202,16 +202,15 @@ Before finalizing any SVG, verify:
 7. Gradients/filters are in \`<defs>\`, not inline
 8. Groups have meaningful IDs
 9. Design has appropriate whitespace/padding from edges
-10. Take a screenshot with \`svg_screenshot\` and review the result visually
+10. Call \`svg_validate_and_screenshot\` and review the result visually
 
 ## 10. Recommended Workflow
 
 1. Start with \`svg_create\` — set up root \`<svg>\` with correct viewBox, \`<defs>\`, and background
 2. Use \`svg_set\` to progressively build: main shapes, then details, then text
-3. Call \`svg_screenshot\` to visually inspect the result
-4. Use \`svg_validate\` to check for structural issues
-5. Iterate: fix any problems found, re-screenshot, confirm quality
-6. Export when satisfied
+3. Call \`svg_validate_and_screenshot\` to check structural quality and visually inspect
+4. Iterate: fix any problems found, re-validate, confirm quality
+5. Export when satisfied
 
 ## 11. Aesthetic Quality Standards
 

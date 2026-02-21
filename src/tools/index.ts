@@ -3,31 +3,23 @@ import type { McpServerContext } from "../mcp-server";
 import { registerSvgCreate } from "./svg-create";
 import { registerSvgSet } from "./svg-set";
 import { registerSvgGet } from "./svg-get";
-import { registerSvgAddElement } from "./svg-add-element";
-import { registerSvgUpdateElement } from "./svg-update-element";
-import { registerSvgRemoveElement } from "./svg-remove-element";
+import { registerSvgModifyElement } from "./svg-modify-element";
 import { registerSvgListElements } from "./svg-list-elements";
-import { registerSvgScreenshot } from "./svg-screenshot";
 import { registerSvgSaveProject } from "./svg-save-project";
 import { registerSvgOpenProject } from "./svg-open-project";
 import { registerSvgExport } from "./svg-export";
-
-import { registerSvgValidate } from "./svg-validate";
 import { registerSvgValidateAndScreenshot } from "./svg-validate-and-screenshot";
+import { registerSvgGetGuidelines } from "./svg-get-guidelines";
 
 export function registerAllTools(server: McpServer, context: McpServerContext) {
     registerSvgCreate(server, context);
     registerSvgSet(server, context);
     registerSvgGet(server, context);
-    registerSvgAddElement(server, context);
-    registerSvgUpdateElement(server, context);
-    registerSvgRemoveElement(server, context);
+    registerSvgModifyElement(server, context);
     registerSvgListElements(server, context);
-    registerSvgScreenshot(server, context);
     registerSvgSaveProject(server, context);
     registerSvgOpenProject(server, context);
     registerSvgExport(server, context);
-
-    registerSvgValidate(server, context);
     registerSvgValidateAndScreenshot(server, context);
+    registerSvgGetGuidelines(server);
 }

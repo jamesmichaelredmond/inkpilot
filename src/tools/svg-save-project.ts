@@ -11,17 +11,14 @@ export function registerSvgSaveProject(
     server.registerTool(
         "svg_save_project",
         {
-            description: "Save the current SVG as an mcpsvg project file (.mcpsvg). This preserves the full project state so it can be reopened later.",
+            description:
+                "Save the current SVG as a .mcpsvg project file for later reopening.",
             inputSchema: {
-                path: z
-                    .string()
-                    .describe(
-                        "Absolute file path to save the .mcpsvg project file (e.g. /home/user/logos/brand.mcpsvg)"
-                    ),
+                path: z.string().describe("Absolute path for the .mcpsvg file"),
                 name: z
                     .string()
                     .optional()
-                    .describe('Friendly project name (e.g. "Brand Logo")'),
+                    .describe("Project name"),
             },
         },
         async ({ path: filePath, name }) => {
