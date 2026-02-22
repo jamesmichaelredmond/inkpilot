@@ -43,6 +43,7 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
         const project = SvgDocument.fromProjectJson(document.getText());
         if (project) {
             svgDoc.create(project.svg);
+            svgDoc.artboardColor = project.artboardColor;
         }
 
         const instance: EditorInstance = {
@@ -69,6 +70,7 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
         if (svg) {
             setTimeout(() => {
                 webviewPanel.webview.postMessage({ type: "updateSvg", svg });
+                webviewPanel.webview.postMessage({ type: "updateArtboard", color: svgDoc.artboardColor });
             }, 100);
         }
 
@@ -113,9 +115,14 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
                 );
                 if (updated) {
                     svgDoc.create(updated.svg);
+                    svgDoc.artboardColor = updated.artboardColor;
                     webviewPanel.webview.postMessage({
                         type: "updateSvg",
                         svg: updated.svg,
+                    });
+                    webviewPanel.webview.postMessage({
+                        type: "updateArtboard",
+                        color: updated.artboardColor,
                     });
                 }
             }
@@ -143,9 +150,10 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
         try {
             project = JSON.parse(document.getText());
         } catch {
-            project = { mcpsvg: "0.1.0", name: "Untitled" };
+            project = { mcpsvg: "0.2.0", name: "Untitled" };
         }
         project.svg = svg;
+        project.artboard = { color: svgDoc.artboardColor };
 
         const newText = JSON.stringify(project, null, 2);
         if (newText === document.getText()) return; // no change
@@ -239,6 +247,10 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
                 type: "updateSvg",
                 svg: this.manualSvgDoc.getSvg(),
             });
+            this.manualPanel.webview.postMessage({
+                type: "updateArtboard",
+                color: this.manualSvgDoc.artboardColor,
+            });
         }
     }
 
@@ -265,6 +277,7 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
             if (instance) {
                 const svg = instance.svgDoc.getSvg();
                 instance.panel.webview.postMessage({ type: "updateSvg", svg });
+                instance.panel.webview.postMessage({ type: "updateArtboard", color: instance.svgDoc.artboardColor });
                 this.applyEditToDocument(instance);
                 return;
             }
@@ -345,6 +358,7 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
     <div id="toolbar"></div>
     <div id="main">
       <div id="canvas-container">
+        <div id="artboard"></div>
         <img id="svg-preview" alt="">
       </div>
     </div>

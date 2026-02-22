@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { McpServerContext } from "../mcp-server";
+import { detectArtboardColor } from "../artboard";
 
 export function registerSvgCreate(
     server: McpServer,
@@ -17,11 +18,32 @@ export function registerSvgCreate(
                     .describe(
                         "Complete SVG markup with xmlns, viewBox, width, height, <defs>, and content groups"
                     ),
+                artboard_color: z
+                    .enum(["light", "dark"])
+                    .or(z.string().regex(/^#[0-9a-fA-F]{3,6}$/))
+                    .optional()
+                    .describe(
+                        'Artboard background: "light", "dark", or hex color. Auto-detected if omitted.'
+                    ),
             },
         },
-        async ({ markup }) => {
+        async ({ markup, artboard_color }) => {
             context.openEditor();
             context.svgDocument.create(markup);
+
+            // Resolve artboard color
+            if (artboard_color) {
+                if (artboard_color === "light") {
+                    context.svgDocument.artboardColor = "#ffffff";
+                } else if (artboard_color === "dark") {
+                    context.svgDocument.artboardColor = "#2d2d2d";
+                } else {
+                    context.svgDocument.artboardColor = artboard_color;
+                }
+            } else {
+                context.svgDocument.artboardColor = detectArtboardColor(markup);
+            }
+
             context.notifyWebview();
             const count = context.svgDocument.listElements().length;
             return {

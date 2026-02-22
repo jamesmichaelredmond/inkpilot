@@ -15,8 +15,8 @@ import type { McpServerContext } from "./mcp-server";
 const EXTENSION_PORT = parseInt(process.env.MCPSVG_PORT || "7100", 10);
 
 /** Fire-and-forget POST to the extension's internal sync endpoint. */
-function syncToExtension(svg: string, action?: string) {
-    const body = JSON.stringify({ svg, action });
+function syncToExtension(svg: string, action?: string, artboardColor?: string) {
+    const body = JSON.stringify({ svg, action, artboardColor });
     const req = http.request(
         {
             hostname: "127.0.0.1",
@@ -45,7 +45,7 @@ svgDocument.on("change", (svg: string) => {
 const context: McpServerContext = {
     svgDocument,
     notifyWebview: () => {
-        syncToExtension(svgDocument.getSvg());
+        syncToExtension(svgDocument.getSvg(), undefined, svgDocument.artboardColor);
     },
     openEditor: () => {
         syncToExtension("", "open");

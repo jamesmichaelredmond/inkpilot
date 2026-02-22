@@ -4,11 +4,13 @@ declare function acquireVsCodeApi(): { postMessage(message: unknown): void };
 const vscode = acquireVsCodeApi();
 
 let svgPreview: HTMLImageElement;
+let artboardEl: HTMLElement;
 let container: HTMLElement;
 
 let currentSvgString = "";
 let svgW = 0;
 let svgH = 0;
+let artboardColor = "#ffffff";
 
 // Zoom/pan state
 let zoom = 1;
@@ -23,6 +25,7 @@ let spaceHeld = false;
 
 function init() {
     svgPreview = document.getElementById("svg-preview") as HTMLImageElement;
+    artboardEl = document.getElementById("artboard")!;
     container = document.getElementById("canvas-container")!;
 
     // Make container focusable for keyboard events
@@ -32,12 +35,21 @@ function init() {
 
     initToolbar(vscode);
 
+    // Show default artboard immediately so the user sees a "page" on open
+    svgW = 400;
+    svgH = 400;
+    fitToViewport();
+
     // Handle messages from extension host
     window.addEventListener("message", async (event) => {
         const message = event.data;
         switch (message.type) {
             case "updateSvg":
                 loadSvg(message.svg);
+                break;
+            case "updateArtboard":
+                artboardColor = message.color;
+                artboardEl.style.backgroundColor = artboardColor;
                 break;
             case "requestScreenshot":
                 sendScreenshot();
@@ -160,6 +172,8 @@ function loadSvg(svgString: string) {
     if (svgW > 0 && svgH > 0) {
         svgPreview.style.width = `${svgW}px`;
         svgPreview.style.height = `${svgH}px`;
+        artboardEl.style.width = `${svgW}px`;
+        artboardEl.style.height = `${svgH}px`;
     }
 
     fitToViewport();
@@ -177,7 +191,9 @@ function fitToViewport() {
 }
 
 function applyTransform() {
-    svgPreview.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+    const t = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+    svgPreview.style.transform = t;
+    artboardEl.style.transform = t;
 }
 
 function sendScreenshot() {
@@ -197,7 +213,7 @@ function sendScreenshot() {
         offscreen.width = w;
         offscreen.height = h;
         const ctx = offscreen.getContext("2d")!;
-        ctx.fillStyle = "#ffffff";
+        ctx.fillStyle = artboardColor;
         ctx.fillRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
         vscode.postMessage({

@@ -48,9 +48,10 @@ export function registerSvgSaveProject(
             const projectName =
                 name || context.svgDocument.projectName || "Untitled";
             const project = {
-                mcpsvg: "0.1.0",
+                mcpsvg: "0.2.0",
                 name: projectName,
                 svg,
+                artboard: { color: context.svgDocument.artboardColor },
             };
 
             fs.writeFileSync(

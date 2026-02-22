@@ -30,7 +30,7 @@ export function registerSvgOpenProject(
             }
 
             const raw = fs.readFileSync(filePath, "utf-8");
-            let project: { mcpsvg?: string; name?: string; svg?: string };
+            let project: { mcpsvg?: string; name?: string; svg?: string; artboard?: { color?: string } };
             try {
                 project = JSON.parse(raw);
             } catch {
@@ -59,6 +59,7 @@ export function registerSvgOpenProject(
 
             context.openEditor();
             context.svgDocument.create(project.svg);
+            context.svgDocument.artboardColor = project.artboard?.color || "#ffffff";
             context.svgDocument.setProject(filePath, project.name);
             context.notifyWebview();
 

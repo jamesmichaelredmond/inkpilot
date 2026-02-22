@@ -51,6 +51,8 @@ export class SvgDocument extends EventEmitter {
     projectPath: string | null = null;
     /** Friendly name for the project. */
     projectName = "Untitled";
+    /** Artboard background color (purely visual, never exported). */
+    artboardColor = "#ffffff";
 
     get isEmpty(): boolean {
         return this.doc === null || !this.doc.querySelector("svg");
@@ -161,21 +163,26 @@ export class SvgDocument extends EventEmitter {
     toProjectJson(name?: string): string {
         return JSON.stringify(
             {
-                mcpsvg: "0.1.0",
+                mcpsvg: "0.2.0",
                 name: name ?? this.projectName,
                 svg: this.getSvg(),
+                artboard: { color: this.artboardColor },
             },
             null,
             2
         );
     }
 
-    /** Parse .mcpsvg project JSON and load the SVG. Returns the project name. */
-    static fromProjectJson(json: string): { svg: string; name: string } | null {
+    /** Parse .mcpsvg project JSON and load the SVG. Returns the project name and artboard color. */
+    static fromProjectJson(json: string): { svg: string; name: string; artboardColor: string } | null {
         try {
-            const project = JSON.parse(json) as { name?: string; svg?: string };
+            const project = JSON.parse(json) as { name?: string; svg?: string; artboard?: { color?: string } };
             if (!project.svg) return null;
-            return { svg: project.svg, name: project.name || "Untitled" };
+            return {
+                svg: project.svg,
+                name: project.name || "Untitled",
+                artboardColor: project.artboard?.color || "#ffffff",
+            };
         } catch {
             return null;
         }
