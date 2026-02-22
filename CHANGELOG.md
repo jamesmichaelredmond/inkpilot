@@ -1,10 +1,58 @@
 # Changelog
 
-## 0.1.0
+All notable changes to mcpsvg are documented here.
 
-- Initial release
-- MCP server with SSE transport (8 tools: create, set, get, add_element, update_element, remove_element, list_elements, screenshot)
+## [Unreleased]
+
+### Added
+- Trackpad navigation: two-finger scroll to pan, pinch-to-zoom
+- File icon for `.mcpsvg` files in the VS Code explorer (light/dark variants)
+- Save As button in the floating toolbar
+- MUI Material icons for toolbar buttons (Save, Save As, Export)
+- Marketplace metadata: keywords, gallery banner, categories
+
+### Changed
+- Toolbar buttons enlarged from 32px to 36px for easier interaction
+- Updated pan/zoom controls: scroll wheel now pans by default, Ctrl+scroll or pinch to zoom
+
+## [0.3.0]
+
+### Added
+- Native SVG preview rendering — replaces Fabric.js canvas for pixel-accurate display of textPath, filters, masks, patterns, and gradients
+- Claude Code auto-registration: MCP server registers/unregisters in `~/.claude.json` on activate/deactivate
+- Artboard with auto light/dark detection based on SVG fill luminance
+- Panel title updates to reflect the current project filename
+- Curved text guidelines and textPath validation for circular badges/seals
+- `svg_get_guidelines` tool for on-demand best practices
+- Shared design philosophy module across all prompts
+- General-purpose `design-graphic` prompt
+- Reference SVG examples in all 5 design prompts
+
+### Changed
+- Webview bundle reduced from 800KB+ (Fabric.js) to ~8KB (native `<img>` rendering)
+- Tool count optimized from 13 to 10 by consolidating overlapping tools, then expanded to 14 with dedicated single-purpose tools
+- Design prompts streamlined: 2-3 build steps instead of 4-5, lightweight creative nudge instead of verbose thinking phase
+- Tool descriptions trimmed to 2-3 sentences max
+
+### Removed
+- Fabric.js dependency and interactive editing (select, move, resize, rotate)
+- Properties panel for element attributes
+- `svg_create_from_template` tool — produced uniform-looking designs
+
+## [0.1.0]
+
+### Added
+- MCP server with SSE transport on configurable port (default 7100)
+- MCP stdio transport for Claude Code
+- 8 SVG tools: create, set, get, add/update/remove element, list elements, screenshot
+- CustomTextEditorProvider for `.mcpsvg` files with dirty state, undo/redo, save
+- Floating action bar with save/export buttons
+- SVG validation tool checking 12 issue types
+- Combined validate-and-screenshot tool
+- MCP resource with SVG design guidelines (structure, typography, color)
+- 5 design prompts: logo, icon, badge, banner, graphic
 - Interactive Fabric.js canvas with select/move/resize/rotate
 - Property panel for editing element attributes
 - Bidirectional sync between AI and visual editor
-- VSCode theme-aware styling
+- VS Code theme-aware webview styling
+- Project save/open with `.mcpsvg` JSON format

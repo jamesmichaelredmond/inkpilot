@@ -1,22 +1,43 @@
 {
     "name": "mcpsvg",
-    "displayName": "mcpsvg",
-    "description": "AI-Powered SVG Editor for VSCode via MCP",
+    "displayName": "mcpsvg — AI-Powered SVG Editor",
+    "description": "Create and edit SVGs with AI via MCP. Live canvas preview with Fabric.js, design prompts, and 13 tools for logos, icons, badges, and more.",
     "version": "0.3.0",
     "publisher": "mcpsvg",
     "license": "MIT",
     "icon": "icon.png",
     "repository": {
         "type": "git",
-        "url": "https://github.com/mcpsvg/mcpsvg"
+        "url": "https://gitlab.com/rockjimstar/mcpsvg"
+    },
+    "homepage": "https://gitlab.com/rockjimstar/mcpsvg#readme",
+    "bugs": {
+        "url": "https://gitlab.com/rockjimstar/mcpsvg/-/issues"
     },
     "engines": {
         "vscode": "^1.109.0"
     },
     "categories": [
         "Visualization",
+        "Machine Learning",
         "Other"
     ],
+    "keywords": [
+        "svg",
+        "mcp",
+        "ai",
+        "design",
+        "vector",
+        "graphics",
+        "editor",
+        "fabric",
+        "claude",
+        "model-context-protocol"
+    ],
+    "galleryBanner": {
+        "color": "#2563eb",
+        "theme": "dark"
+    },
     "activationEvents": [
         "onStartupFinished"
     ],

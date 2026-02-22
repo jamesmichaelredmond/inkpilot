@@ -25,11 +25,11 @@ You: "Perfect. Export it."
 
 ### Live Visual Editor
 - Real-time SVG preview as the AI builds your design
-- Zoom (scroll wheel) and pan (Space+drag, middle-mouse, Alt+drag)
+- Trackpad pan (two-finger scroll) and pinch-to-zoom, plus Space+drag, middle-mouse, and Alt+drag
 - Native SVG rendering — what you see is what you export
 - VS Code theme-aware interface
 
-### 10 MCP Tools
+### 14 MCP Tools
 The AI uses these tools to create and modify SVGs programmatically:
 
 | Tool | Description |
@@ -37,9 +37,13 @@ The AI uses these tools to create and modify SVGs programmatically:
 | `svg_create` | Create a new SVG and open the visual editor |
 | `svg_set` | Replace the entire SVG markup |
 | `svg_get` | Read the current SVG source |
-| `svg_modify_element` | Add, update, or remove individual elements by ID |
+| `svg_add_element` | Add a single element to the document |
+| `svg_update_element` | Update an existing element's attributes by ID |
+| `svg_remove_element` | Remove an element by ID |
+| `svg_modify_element` | Add, update, or remove a single element (combined) |
 | `svg_list_elements` | Inspect all elements with their IDs and attributes |
-| `svg_validate_and_screenshot` | Validate structure and render a PNG screenshot for the AI to review |
+| `svg_validate_and_screenshot` | Validate structure and/or render a PNG screenshot for AI review |
+| `svg_screenshot` | Render the current SVG to a PNG for visual feedback |
 | `svg_get_guidelines` | Retrieve SVG design best practices |
 | `svg_save_project` | Save as a `.mcpsvg` project file |
 | `svg_open_project` | Load a saved project |

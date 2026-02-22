@@ -6,7 +6,7 @@ AI clients connect via MCP and use the tools to create, modify, and export SVG f
 that are displayed in a live VSCode editor panel with a Fabric.js canvas.
 
 ## Project Structure
-- `src/tools/` — 13 MCP tool implementations (svg_create, svg_set, svg_get, etc.)
+- `src/tools/` — 14 MCP tool implementations (svg_create, svg_set, svg_get, etc.)
 - `src/prompts/` — 5 MCP design prompts (logo, icon, badge, banner, graphic) + shared design philosophy
 - `src/resources/` — MCP resource (svg-design-guidelines)
 - `src/extension.ts` — VSCode extension entry point
