@@ -76,7 +76,7 @@ Save your work as `.inkp` project files that preserve the full SVG state. Double
 ### 1. Install the extension
 Search for **inkpilot** in the VS Code Extensions marketplace, or install from the command line:
 ```
-code --install-extension inkpilot.inkpilot
+code --install-extension Redmond-Enterprises-LLC.inkpilot
 ```
 
 ### 2. Connect an AI client
