@@ -12,22 +12,16 @@ export function initToolbar(vscode: VsCodeApi) {
 
 // ── Floating action bar ──────────────────────────────────────────────
 
-const SAVE_ICON = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M12.5 14H3.5C3.10218 14 2.72064 13.842 2.43934 13.5607C2.15804 13.2794 2 12.8978 2 12.5V3.5C2 3.10218 2.15804 2.72064 2.43934 2.43934C2.72064 2.15804 3.10218 2 3.5 2H10.5L14 5.5V12.5C14 12.8978 13.842 13.2794 13.5607 13.5607C13.2794 13.842 12.8978 14 12.5 14Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M11 14V9H5V14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M5 2V5.5H9.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+const SAVE_ICON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+  <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3m3-10H5V5h10z"/>
 </svg>`;
 
-const SAVE_AS_ICON = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M12.5 14H3.5C3.1 14 2.72 13.842 2.44 13.561C2.16 13.279 2 12.898 2 12.5V3.5C2 3.1 2.16 2.72 2.44 2.44C2.72 2.16 3.1 2 3.5 2H10.5L14 5.5V12.5C14 12.898 13.842 13.279 13.561 13.561C13.279 13.842 12.898 14 12.5 14Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M12 8L14 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-  <path d="M13 7L13 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+const SAVE_AS_ICON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+  <path d="M21 12.4V7l-4-4H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h7.4zM15 15c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3 3 1.34 3 3M6 6h9v4H6zm13.99 10.25 1.77 1.77L16.77 23H15v-1.77zm3.26.26-.85.85-1.77-1.77.85-.85c.2-.2.51-.2.71 0l1.06 1.06c.2.2.2.52 0 .71"/>
 </svg>`;
 
-const EXPORT_ICON = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M14 10V12.5C14 12.8978 13.842 13.2794 13.5607 13.5607C13.2794 13.842 12.8978 14 12.5 14H3.5C3.10218 14 2.72064 13.842 2.43934 13.5607C2.15804 13.2794 2 12.8978 2 12.5V10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M5 6.5L8 3.5L11 6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M8 3.5V10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+const EXPORT_ICON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+  <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
 </svg>`;
 
 function buildActionBar(vscode: VsCodeApi) {

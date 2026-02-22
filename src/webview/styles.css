@@ -71,8 +71,8 @@ body {
     left: 12px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    padding: 4px;
+    gap: 4px;
+    padding: 5px;
     background: var(--vscode-titleBar-activeBackground, #2d2d2d);
     border: 1px solid var(--vscode-panel-border, #444);
     border-radius: 6px;
@@ -84,8 +84,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border: none;
     border-radius: 4px;
     background: transparent;
