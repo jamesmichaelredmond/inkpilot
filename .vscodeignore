@@ -1,7 +1,12 @@
 .github/
+.vscode/
+.claude/
 src/
+node_modules/
 *.ts
 tsconfig.json
 esbuild.config.mjs
 .gitignore
 .vscode-test/
+test-prompts.mjs
+CLAUDE.md
