@@ -96,6 +96,16 @@
                 "priority": "default"
             }
         ],
+        "languages": [
+            {
+                "id": "mcpsvg",
+                "extensions": [".mcpsvg"],
+                "icon": {
+                    "light": "./icons/mcpsvg-file-light.svg",
+                    "dark": "./icons/mcpsvg-file-dark.svg"
+                }
+            }
+        ],
         "mcpServerDefinitionProviders": [
             {
                 "id": "mcpsvg.mcpServer",

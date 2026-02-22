@@ -65,19 +65,26 @@ function init() {
     });
     resizeObserver.observe(container);
 
-    // --- Zoom (scroll wheel toward cursor) ---
+    // --- Pan & Zoom (trackpad two-finger scroll / pinch, or mouse wheel) ---
     container.addEventListener("wheel", (e) => {
         e.preventDefault();
-        const delta = e.deltaY;
-        const newZoom = Math.min(Math.max(zoom * 0.999 ** delta, 0.1), 20);
 
-        // Zoom toward cursor position
-        const rect = container.getBoundingClientRect();
-        const cursorX = e.clientX - rect.left;
-        const cursorY = e.clientY - rect.top;
-        panX = cursorX - (cursorX - panX) * (newZoom / zoom);
-        panY = cursorY - (cursorY - panY) * (newZoom / zoom);
-        zoom = newZoom;
+        if (e.ctrlKey) {
+            // Pinch-to-zoom (trackpad) or Ctrl+scroll (mouse)
+            const delta = e.deltaY;
+            const newZoom = Math.min(Math.max(zoom * 0.99 ** delta, 0.1), 20);
+
+            const rect = container.getBoundingClientRect();
+            const cursorX = e.clientX - rect.left;
+            const cursorY = e.clientY - rect.top;
+            panX = cursorX - (cursorX - panX) * (newZoom / zoom);
+            panY = cursorY - (cursorY - panY) * (newZoom / zoom);
+            zoom = newZoom;
+        } else {
+            // Two-finger scroll (trackpad) or plain scroll wheel → pan
+            panX -= e.deltaX;
+            panY -= e.deltaY;
+        }
 
         applyTransform();
     }, { passive: false });
