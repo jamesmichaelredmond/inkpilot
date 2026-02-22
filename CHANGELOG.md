@@ -2,9 +2,11 @@
 
 All notable changes to inkpilot are documented here.
 
-## [1.0.1] - 2026-02-22
+## [1.0.2] - 2026-02-22
 
 ### Fixed
+- Updated extension description to remove outdated Fabric.js reference and correct tool count
+- Fixed install command in README to use correct publisher ID
 - Updated changelog to reflect 1.0.0 release (was showing "Unreleased")
 
 ## [1.0.0] - 2026-02-22
