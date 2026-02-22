@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import path from "path";
 import { SvgDocument } from "./svg-document";
 
 /** Per-custom-editor state. */
@@ -88,6 +89,9 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
                             "workbench.action.files.save"
                         );
                         break;
+                    case "saveAs":
+                        vscode.commands.executeCommand("mcpsvg.saveProjectAs");
+                        break;
                     case "export":
                         vscode.commands.executeCommand("mcpsvg.exportSvg");
                         break;
@@ -174,6 +178,15 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
     //  Manual panel — MCP create-from-scratch workflow (no file yet)
     // ═══════════════════════════════════════════════════════════════════
 
+    updatePanelTitle(): void {
+        if (!this.manualPanel) return;
+        if (this.manualSvgDoc.projectPath) {
+            this.manualPanel.title = path.basename(this.manualSvgDoc.projectPath);
+        } else {
+            this.manualPanel.title = "mcpsvg Editor";
+        }
+    }
+
     openEditor(): void {
         // If a custom editor is active, just reveal it
         if (this.activeEditorUri) {
@@ -209,6 +222,9 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
 
         this.manualPanel.webview.html = this.getHtml(this.manualPanel.webview);
 
+        const projectListener = () => this.updatePanelTitle();
+        this.manualSvgDoc.on("project", projectListener);
+
         this.manualPanel.webview.onDidReceiveMessage(
             (message) => {
                 switch (message.type) {
@@ -220,6 +236,9 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
                     case "save":
                         vscode.commands.executeCommand("mcpsvg.saveProject");
                         break;
+                    case "saveAs":
+                        vscode.commands.executeCommand("mcpsvg.saveProjectAs");
+                        break;
                     case "export":
                         vscode.commands.executeCommand("mcpsvg.exportSvg");
                         break;
@@ -230,6 +249,7 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
         );
 
         this.manualPanel.onDidDispose(() => {
+            this.manualSvgDoc.off("project", projectListener);
             this.manualPanel = null;
             for (const resolver of this.screenshotResolvers) resolver("");
             this.screenshotResolvers = [];

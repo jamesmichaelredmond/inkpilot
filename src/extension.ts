@@ -201,8 +201,9 @@ export function activate(context: vscode.ExtensionContext) {
 function writeProject(svgDoc: SvgDocument, filePath: string) {
     const dir = path.dirname(filePath);
     fs.mkdirSync(dir, { recursive: true });
+    const name = path.basename(filePath, ".mcpsvg");
+    svgDoc.setProject(filePath, name);
     fs.writeFileSync(filePath, svgDoc.toProjectJson(), "utf-8");
-    svgDoc.setProject(filePath);
 }
 
 function startServer(

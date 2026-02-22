@@ -61,11 +61,13 @@ export class SvgDocument extends EventEmitter {
     setProject(path: string, name?: string): void {
         this.projectPath = path;
         if (name) this.projectName = name;
+        this.emit("project");
     }
 
     clearProject(): void {
         this.projectPath = null;
         this.projectName = "Untitled";
+        this.emit("project");
     }
 
     create(svgMarkup: string): void {
