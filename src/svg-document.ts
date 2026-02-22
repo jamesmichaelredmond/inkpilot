@@ -47,7 +47,7 @@ export class SvgDocument extends EventEmitter {
     private doc: ReturnType<DOMParser["parseFromString"]> | null = null;
     private idCounter = 0;
 
-    /** Path to the current .mcpsvg project file (null if unsaved). */
+    /** Path to the current .inkp project file (null if unsaved). */
     projectPath: string | null = null;
     /** Friendly name for the project. */
     projectName = "Untitled";
@@ -161,11 +161,11 @@ export class SvgDocument extends EventEmitter {
         return elements;
     }
 
-    /** Serialize current state into .mcpsvg project JSON. */
+    /** Serialize current state into .inkp project JSON. */
     toProjectJson(name?: string): string {
         return JSON.stringify(
             {
-                mcpsvg: "0.2.0",
+                inkpilot: "0.2.0",
                 name: name ?? this.projectName,
                 svg: this.getSvg(),
                 artboard: { color: this.artboardColor },
@@ -175,7 +175,7 @@ export class SvgDocument extends EventEmitter {
         );
     }
 
-    /** Parse .mcpsvg project JSON and load the SVG. Returns the project name and artboard color. */
+    /** Parse .inkp project JSON and load the SVG. Returns the project name and artboard color. */
     static fromProjectJson(json: string): { svg: string; name: string; artboardColor: string } | null {
         try {
             const project = JSON.parse(json) as { name?: string; svg?: string; artboard?: { color?: string } };
@@ -191,7 +191,7 @@ export class SvgDocument extends EventEmitter {
     }
 
     private generateId(): string {
-        return `mcpsvg-${++this.idCounter}`;
+        return `inkp-${++this.idCounter}`;
     }
 
     private ensureIds(): void {

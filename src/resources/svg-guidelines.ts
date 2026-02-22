@@ -1,8 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-export const SVG_GUIDELINES_URI = "mcpsvg://guidelines/svg-design";
+export const SVG_GUIDELINES_URI = "inkpilot://guidelines/svg-design";
 
-export const SVG_DESIGN_GUIDELINES = `# SVG Design Guidelines for mcpsvg
+export const SVG_DESIGN_GUIDELINES = `# SVG Design Guidelines for inkpilot
 
 ## 1. SVG Structure
 

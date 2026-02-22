@@ -21,7 +21,7 @@ export function createMcpApp(context: McpServerContext) {
     app.get("/sse", async (req, res) => {
         // Each SSE connection gets its own McpServer instance
         const server = new McpServer(
-            { name: "mcpsvg", version: "0.1.0" },
+            { name: "inkpilot", version: "0.1.0" },
             { capabilities: { tools: {}, resources: {}, prompts: {} } }
         );
 

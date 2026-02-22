@@ -12,7 +12,7 @@ interface EditorInstance {
 }
 
 export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
-    // ── Custom editor instances (file-backed .mcpsvg) ──
+    // ── Custom editor instances (file-backed .inkp) ──
     private editors = new Map<string, EditorInstance>();
     private activeEditorUri: string | null = null;
 
@@ -29,7 +29,7 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
     ) {}
 
     // ═══════════════════════════════════════════════════════════════════
-    //  CustomTextEditorProvider — VS Code calls this for .mcpsvg files
+    //  CustomTextEditorProvider — VS Code calls this for .inkp files
     // ═══════════════════════════════════════════════════════════════════
 
     resolveCustomTextEditor(
@@ -90,10 +90,10 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
                         );
                         break;
                     case "saveAs":
-                        vscode.commands.executeCommand("mcpsvg.saveProjectAs");
+                        vscode.commands.executeCommand("inkpilot.saveProjectAs");
                         break;
                     case "export":
-                        vscode.commands.executeCommand("mcpsvg.exportSvg");
+                        vscode.commands.executeCommand("inkpilot.exportSvg");
                         break;
                 }
             }
@@ -154,7 +154,7 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
         try {
             project = JSON.parse(document.getText());
         } catch {
-            project = { mcpsvg: "0.2.0", name: "Untitled" };
+            project = { inkpilot: "0.2.0", name: "Untitled" };
         }
         project.svg = svg;
         project.artboard = { color: svgDoc.artboardColor };
@@ -183,7 +183,7 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
         if (this.manualSvgDoc.projectPath) {
             this.manualPanel.title = path.basename(this.manualSvgDoc.projectPath);
         } else {
-            this.manualPanel.title = "mcpsvg Editor";
+            this.manualPanel.title = "inkpilot Editor";
         }
     }
 
@@ -203,8 +203,8 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
         }
 
         this.manualPanel = vscode.window.createWebviewPanel(
-            "mcpsvg.editor",
-            "mcpsvg Editor",
+            "inkpilot.editor",
+            "inkpilot Editor",
             vscode.ViewColumn.Beside,
             {
                 enableScripts: true,
@@ -234,13 +234,13 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
                         break;
                     }
                     case "save":
-                        vscode.commands.executeCommand("mcpsvg.saveProject");
+                        vscode.commands.executeCommand("inkpilot.saveProject");
                         break;
                     case "saveAs":
-                        vscode.commands.executeCommand("mcpsvg.saveProjectAs");
+                        vscode.commands.executeCommand("inkpilot.saveProjectAs");
                         break;
                     case "export":
-                        vscode.commands.executeCommand("mcpsvg.exportSvg");
+                        vscode.commands.executeCommand("inkpilot.exportSvg");
                         break;
                 }
             },
@@ -371,7 +371,7 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
     content="default-src 'none'; img-src ${webview.cspSource} data:; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="${stylesUri}" rel="stylesheet">
-  <title>mcpsvg Editor</title>
+  <title>inkpilot Editor</title>
 </head>
 <body>
   <div id="app">

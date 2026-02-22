@@ -1,5 +1,5 @@
 /**
- * Standalone stdio MCP server for mcpsvg.
+ * Standalone stdio MCP server for inkpilot.
  * Launched by Claude Code (via mcpServerDefinitionProviders) or any stdio MCP client.
  * Syncs SVG state to the extension's webview via HTTP IPC on the configured port.
  */
@@ -12,7 +12,7 @@ import { registerAllResources } from "./resources";
 import { registerAllTools } from "./tools";
 import type { McpServerContext } from "./mcp-server";
 
-const EXTENSION_PORT = parseInt(process.env.MCPSVG_PORT || "7100", 10);
+const EXTENSION_PORT = parseInt(process.env.INKPILOT_PORT || "7100", 10);
 
 /** Fire-and-forget POST to the extension's internal sync endpoint. */
 function syncToExtension(svg: string, action?: string, artboardColor?: string) {
@@ -57,7 +57,7 @@ const context: McpServerContext = {
 };
 
 const server = new McpServer(
-    { name: "mcpsvg", version: "0.1.0" },
+    { name: "inkpilot", version: "0.1.0" },
     { capabilities: { tools: {}, resources: {}, prompts: {} } }
 );
 

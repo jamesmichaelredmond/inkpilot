@@ -11,9 +11,9 @@ export function registerSvgOpenProject(
         "svg_open_project",
         {
             description:
-                "Open a .mcpsvg project file and load its SVG into the editor.",
+                "Open a .inkp project file and load its SVG into the editor.",
             inputSchema: {
-                path: z.string().describe("Absolute path to the .mcpsvg file"),
+                path: z.string().describe("Absolute path to the .inkp file"),
             },
         },
         async ({ path: filePath }) => {
@@ -30,7 +30,7 @@ export function registerSvgOpenProject(
             }
 
             const raw = fs.readFileSync(filePath, "utf-8");
-            let project: { mcpsvg?: string; name?: string; svg?: string; artboard?: { color?: string } };
+            let project: { inkpilot?: string; name?: string; svg?: string; artboard?: { color?: string } };
             try {
                 project = JSON.parse(raw);
             } catch {

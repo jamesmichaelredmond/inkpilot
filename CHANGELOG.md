@@ -1,12 +1,12 @@
 # Changelog
 
-All notable changes to mcpsvg are documented here.
+All notable changes to inkpilot are documented here.
 
 ## [Unreleased]
 
 ### Added
 - Trackpad navigation: two-finger scroll to pan, pinch-to-zoom
-- File icon for `.mcpsvg` files in the VS Code explorer (light/dark variants)
+- File icon for `.inkp` files in the VS Code explorer (light/dark variants)
 - Save As button in the floating toolbar
 - MUI Material icons for toolbar buttons (Save, Save As, Export)
 - Marketplace metadata: keywords, gallery banner, categories
@@ -45,7 +45,7 @@ All notable changes to mcpsvg are documented here.
 - MCP server with SSE transport on configurable port (default 7100)
 - MCP stdio transport for Claude Code
 - 8 SVG tools: create, set, get, add/update/remove element, list elements, screenshot
-- CustomTextEditorProvider for `.mcpsvg` files with dirty state, undo/redo, save
+- CustomTextEditorProvider for `.inkp` files with dirty state, undo/redo, save
 - Floating action bar with save/export buttons
 - SVG validation tool checking 12 issue types
 - Combined validate-and-screenshot tool
@@ -55,4 +55,4 @@ All notable changes to mcpsvg are documented here.
 - Property panel for editing element attributes
 - Bidirectional sync between AI and visual editor
 - VS Code theme-aware webview styling
-- Project save/open with `.mcpsvg` JSON format
+- Project save/open with `.inkp` JSON format

@@ -1,15 +1,15 @@
-# mcpsvg
+# inkpilot
 
 **AI-powered SVG creation and editing, right inside VS Code.**
 
 Tell your AI what to design. Watch it build — logos, icons, badges, banners — live in a visual editor. Iterate by conversation, not by hand.
 
 <!-- TODO: Add a screenshot or GIF here showing the editor in action -->
-<!-- ![mcpsvg in action](images/demo.gif) -->
+<!-- ![inkpilot in action](images/demo.gif) -->
 
 ## How It Works
 
-mcpsvg is a VS Code extension that runs an [MCP](https://modelcontextprotocol.io/) (Model Context Protocol) server. Any MCP-compatible AI client — Claude, Copilot Chat, or others — connects to the server and gets access to tools for creating and manipulating SVG graphics. Changes appear instantly in a live preview panel.
+inkpilot is a VS Code extension that runs an [MCP](https://modelcontextprotocol.io/) (Model Context Protocol) server. Any MCP-compatible AI client — Claude, Copilot Chat, or others — connects to the server and gets access to tools for creating and manipulating SVG graphics. Changes appear instantly in a live preview panel.
 
 ```
 You: "Design a logo for a coffee shop called Brewed Awakening"
@@ -45,7 +45,7 @@ The AI uses these tools to create and modify SVGs programmatically:
 | `svg_validate_and_screenshot` | Validate structure and/or render a PNG screenshot for AI review |
 | `svg_screenshot` | Render the current SVG to a PNG for visual feedback |
 | `svg_get_guidelines` | Retrieve SVG design best practices |
-| `svg_save_project` | Save as a `.mcpsvg` project file |
+| `svg_save_project` | Save as a `.inkp` project file |
 | `svg_open_project` | Load a saved project |
 | `svg_export` | Export as a standalone `.svg` file |
 
@@ -69,14 +69,14 @@ The extension ships with comprehensive SVG design guidelines covering:
 - A quality checklist the AI follows before presenting results
 
 ### Project Files
-Save your work as `.mcpsvg` project files that preserve the full SVG state. Double-click to reopen in the editor and continue iterating with the AI.
+Save your work as `.inkp` project files that preserve the full SVG state. Double-click to reopen in the editor and continue iterating with the AI.
 
 ## Getting Started
 
 ### 1. Install the extension
-Search for **mcpsvg** in the VS Code Extensions marketplace, or install from the command line:
+Search for **inkpilot** in the VS Code Extensions marketplace, or install from the command line:
 ```
-code --install-extension mcpsvg.mcpsvg
+code --install-extension inkpilot.inkpilot
 ```
 
 ### 2. Connect an AI client
@@ -96,7 +96,7 @@ http://localhost:7100/sse
 ### 3. Start designing
 Open the command palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run:
 ```
-mcpsvg: Open SVG Editor
+inkpilot: Open SVG Editor
 ```
 
 Then ask your AI to design something. Use the design prompts for best results:
@@ -109,18 +109,18 @@ Or just describe what you want:
 
 | Command | Shortcut | Description |
 |---------|----------|-------------|
-| `mcpsvg: Open SVG Editor` | | Open the visual editor panel |
-| `mcpsvg: Start MCP Server` | | Manually start the MCP server |
-| `mcpsvg: Save Project` | `Ctrl+S` / `Cmd+S` | Save the current project |
-| `mcpsvg: Save Project As...` | `Ctrl+Shift+S` / `Cmd+Shift+S` | Save to a new location |
-| `mcpsvg: Open Project` | `Ctrl+O` / `Cmd+O` | Open a `.mcpsvg` project file |
-| `mcpsvg: Export SVG` | `Ctrl+E` / `Cmd+E` | Export as a standalone `.svg` file |
+| `inkpilot: Open SVG Editor` | | Open the visual editor panel |
+| `inkpilot: Start MCP Server` | | Manually start the MCP server |
+| `inkpilot: Save Project` | `Ctrl+S` / `Cmd+S` | Save the current project |
+| `inkpilot: Save Project As...` | `Ctrl+Shift+S` / `Cmd+Shift+S` | Save to a new location |
+| `inkpilot: Open Project` | `Ctrl+O` / `Cmd+O` | Open a `.inkp` project file |
+| `inkpilot: Export SVG` | `Ctrl+E` / `Cmd+E` | Export as a standalone `.svg` file |
 
 ## Settings
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `mcpsvg.port` | `7100` | Port for the MCP SSE server |
+| `inkpilot.port` | `7100` | Port for the MCP SSE server |
 
 ## Requirements
 

@@ -1,9 +1,9 @@
 {
-    "name": "mcpsvg",
-    "displayName": "mcpsvg — AI-Powered SVG Editor",
+    "name": "inkpilot",
+    "displayName": "inkpilot — AI-Powered SVG Editor",
     "description": "Create and edit SVGs with AI via MCP. Live canvas preview with Fabric.js, design prompts, and 13 tools for logos, icons, badges, and more.",
     "version": "0.3.0",
-    "publisher": "mcpsvg",
+    "publisher": "inkpilot",
     "license": "MIT",
     "icon": "icon.png",
     "repository": {
@@ -45,60 +45,60 @@
     "contributes": {
         "commands": [
             {
-                "command": "mcpsvg.openEditor",
-                "title": "mcpsvg: Open SVG Editor"
+                "command": "inkpilot.openEditor",
+                "title": "inkpilot: Open SVG Editor"
             },
             {
-                "command": "mcpsvg.startServer",
-                "title": "mcpsvg: Start MCP Server"
+                "command": "inkpilot.startServer",
+                "title": "inkpilot: Start MCP Server"
             },
             {
-                "command": "mcpsvg.saveProject",
-                "title": "mcpsvg: Save Project"
+                "command": "inkpilot.saveProject",
+                "title": "inkpilot: Save Project"
             },
             {
-                "command": "mcpsvg.saveProjectAs",
-                "title": "mcpsvg: Save Project As..."
+                "command": "inkpilot.saveProjectAs",
+                "title": "inkpilot: Save Project As..."
             },
             {
-                "command": "mcpsvg.openProject",
-                "title": "mcpsvg: Open Project"
+                "command": "inkpilot.openProject",
+                "title": "inkpilot: Open Project"
             },
             {
-                "command": "mcpsvg.exportSvg",
-                "title": "mcpsvg: Export SVG"
+                "command": "inkpilot.exportSvg",
+                "title": "inkpilot: Export SVG"
             }
         ],
         "keybindings": [
             {
-                "command": "mcpsvg.saveProject",
+                "command": "inkpilot.saveProject",
                 "key": "ctrl+s",
                 "mac": "cmd+s",
-                "when": "activeWebviewPanelId == 'mcpsvg.editor' || activeCustomEditorId == 'mcpsvg.svgEditor'"
+                "when": "activeWebviewPanelId == 'inkpilot.editor' || activeCustomEditorId == 'inkpilot.svgEditor'"
             },
             {
-                "command": "mcpsvg.saveProjectAs",
+                "command": "inkpilot.saveProjectAs",
                 "key": "ctrl+shift+s",
                 "mac": "cmd+shift+s",
-                "when": "activeWebviewPanelId == 'mcpsvg.editor' || activeCustomEditorId == 'mcpsvg.svgEditor'"
+                "when": "activeWebviewPanelId == 'inkpilot.editor' || activeCustomEditorId == 'inkpilot.svgEditor'"
             },
             {
-                "command": "mcpsvg.openProject",
+                "command": "inkpilot.openProject",
                 "key": "ctrl+o",
                 "mac": "cmd+o",
-                "when": "activeWebviewPanelId == 'mcpsvg.editor' || activeCustomEditorId == 'mcpsvg.svgEditor'"
+                "when": "activeWebviewPanelId == 'inkpilot.editor' || activeCustomEditorId == 'inkpilot.svgEditor'"
             },
             {
-                "command": "mcpsvg.exportSvg",
+                "command": "inkpilot.exportSvg",
                 "key": "ctrl+e",
                 "mac": "cmd+e",
-                "when": "activeWebviewPanelId == 'mcpsvg.editor' || activeCustomEditorId == 'mcpsvg.svgEditor'"
+                "when": "activeWebviewPanelId == 'inkpilot.editor' || activeCustomEditorId == 'inkpilot.svgEditor'"
             }
         ],
         "configuration": {
-            "title": "mcpsvg",
+            "title": "inkpilot",
             "properties": {
-                "mcpsvg.port": {
+                "inkpilot.port": {
                     "type": "number",
                     "default": 7100,
                     "description": "Port for the MCP SSE server"
@@ -107,11 +107,11 @@
         },
         "customEditors": [
             {
-                "viewType": "mcpsvg.svgEditor",
-                "displayName": "mcpsvg SVG Editor",
+                "viewType": "inkpilot.svgEditor",
+                "displayName": "inkpilot SVG Editor",
                 "selector": [
                     {
-                        "filenamePattern": "*.mcpsvg"
+                        "filenamePattern": "*.inkp"
                     }
                 ],
                 "priority": "default"
@@ -119,18 +119,18 @@
         ],
         "languages": [
             {
-                "id": "mcpsvg",
-                "extensions": [".mcpsvg"],
+                "id": "inkpilot",
+                "extensions": [".inkp"],
                 "icon": {
-                    "light": "./icons/mcpsvg-file-light.svg",
-                    "dark": "./icons/mcpsvg-file-dark.svg"
+                    "light": "./icons/inkp-file-light.svg",
+                    "dark": "./icons/inkp-file-dark.svg"
                 }
             }
         ],
         "mcpServerDefinitionProviders": [
             {
-                "id": "mcpsvg.mcpServer",
-                "label": "mcpsvg SVG Editor"
+                "id": "inkpilot.mcpServer",
+                "label": "inkpilot SVG Editor"
             }
         ]
     },

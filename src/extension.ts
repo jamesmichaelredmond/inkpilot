@@ -19,7 +19,7 @@ function registerWithClaudeCode(port: number) {
         const raw = fs.readFileSync(CLAUDE_CONFIG, "utf-8");
         const config = JSON.parse(raw);
         if (!config.mcpServers) config.mcpServers = {};
-        config.mcpServers.mcpsvg = {
+        config.mcpServers.inkpilot = {
             type: "sse",
             url: `http://localhost:${port}/sse`,
         };
@@ -34,8 +34,8 @@ function unregisterFromClaudeCode() {
         if (!fs.existsSync(CLAUDE_CONFIG)) return;
         const raw = fs.readFileSync(CLAUDE_CONFIG, "utf-8");
         const config = JSON.parse(raw);
-        if (config.mcpServers?.mcpsvg) {
-            delete config.mcpServers.mcpsvg;
+        if (config.mcpServers?.inkpilot) {
+            delete config.mcpServers.inkpilot;
             fs.writeFileSync(CLAUDE_CONFIG, JSON.stringify(config, null, 2), "utf-8");
         }
     } catch {
@@ -48,10 +48,10 @@ export function activate(context: vscode.ExtensionContext) {
     const svgDocument = new SvgDocument();
     const editorProvider = new SvgEditorProvider(context, svgDocument);
 
-    // ── Register custom editor for .mcpsvg files ──
+    // ── Register custom editor for .inkp files ──
     context.subscriptions.push(
         vscode.window.registerCustomEditorProvider(
-            "mcpsvg.svgEditor",
+            "inkpilot.svgEditor",
             editorProvider,
             { webviewOptions: { retainContextWhenHidden: true } }
         )
@@ -59,16 +59,16 @@ export function activate(context: vscode.ExtensionContext) {
 
     // ── Commands ──
     context.subscriptions.push(
-        vscode.commands.registerCommand("mcpsvg.openEditor", () => {
+        vscode.commands.registerCommand("inkpilot.openEditor", () => {
             editorProvider.openEditor();
         })
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand("mcpsvg.startServer", () => {
+        vscode.commands.registerCommand("inkpilot.startServer", () => {
             if (httpServer) {
                 vscode.window.showInformationMessage(
-                    "mcpsvg MCP server is already running."
+                    "inkpilot MCP server is already running."
                 );
                 return;
             }
@@ -79,7 +79,7 @@ export function activate(context: vscode.ExtensionContext) {
     // Save: if there's a file-backed custom editor, save it natively.
     // Otherwise fall back to "Save As" for the manual panel.
     context.subscriptions.push(
-        vscode.commands.registerCommand("mcpsvg.saveProject", async () => {
+        vscode.commands.registerCommand("inkpilot.saveProject", async () => {
             const activeDoc = editorProvider.getActiveSvgDocument();
             if (activeDoc.isEmpty) {
                 vscode.window.showWarningMessage(
@@ -102,13 +102,13 @@ export function activate(context: vscode.ExtensionContext) {
                 );
             } else {
                 // Manual panel, never saved — prompt Save As
-                await vscode.commands.executeCommand("mcpsvg.saveProjectAs");
+                await vscode.commands.executeCommand("inkpilot.saveProjectAs");
             }
         })
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand("mcpsvg.saveProjectAs", async () => {
+        vscode.commands.registerCommand("inkpilot.saveProjectAs", async () => {
             const activeDoc = editorProvider.getActiveSvgDocument();
             if (activeDoc.isEmpty) {
                 vscode.window.showWarningMessage(
@@ -117,7 +117,7 @@ export function activate(context: vscode.ExtensionContext) {
                 return;
             }
             const uri = await vscode.window.showSaveDialog({
-                filters: { "mcpsvg Project": ["mcpsvg"] },
+                filters: { "inkpilot Project": ["inkp"] },
                 defaultUri: svgDocument.projectPath
                     ? vscode.Uri.file(svgDocument.projectPath)
                     : undefined,
@@ -131,9 +131,9 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand("mcpsvg.openProject", async () => {
+        vscode.commands.registerCommand("inkpilot.openProject", async () => {
             const uris = await vscode.window.showOpenDialog({
-                filters: { "mcpsvg Project": ["mcpsvg"] },
+                filters: { "inkpilot Project": ["inkp"] },
                 canSelectMany: false,
             });
             if (!uris || uris.length === 0) return;
@@ -141,13 +141,13 @@ export function activate(context: vscode.ExtensionContext) {
             await vscode.commands.executeCommand(
                 "vscode.openWith",
                 uris[0],
-                "mcpsvg.svgEditor"
+                "inkpilot.svgEditor"
             );
         })
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand("mcpsvg.exportSvg", async () => {
+        vscode.commands.registerCommand("inkpilot.exportSvg", async () => {
             const activeDoc = editorProvider.getActiveSvgDocument();
             if (activeDoc.isEmpty) {
                 vscode.window.showWarningMessage(
@@ -172,7 +172,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // ── MCP server discovery ──
     const port = vscode.workspace
-        .getConfiguration("mcpsvg")
+        .getConfiguration("inkpilot")
         .get<number>("port", 7100);
     const mcpStdioPath = vscode.Uri.joinPath(
         context.extensionUri,
@@ -181,13 +181,13 @@ export function activate(context: vscode.ExtensionContext) {
     ).fsPath;
 
     context.subscriptions.push(
-        vscode.lm.registerMcpServerDefinitionProvider("mcpsvg.mcpServer", {
+        vscode.lm.registerMcpServerDefinitionProvider("inkpilot.mcpServer", {
             provideMcpServerDefinitions: async () => [
                 new vscode.McpStdioServerDefinition(
-                    "mcpsvg",
+                    "inkpilot",
                     "node",
                     [mcpStdioPath],
-                    { MCPSVG_PORT: String(port) },
+                    { INKPILOT_PORT: String(port) },
                     "0.1.0"
                 ),
             ],
@@ -201,7 +201,7 @@ export function activate(context: vscode.ExtensionContext) {
 function writeProject(svgDoc: SvgDocument, filePath: string) {
     const dir = path.dirname(filePath);
     fs.mkdirSync(dir, { recursive: true });
-    const name = path.basename(filePath, ".mcpsvg");
+    const name = path.basename(filePath, ".inkp");
     svgDoc.setProject(filePath, name);
     fs.writeFileSync(filePath, svgDoc.toProjectJson(), "utf-8");
 }
@@ -211,7 +211,7 @@ function startServer(
     editorProvider: SvgEditorProvider
 ) {
     const port = vscode.workspace
-        .getConfiguration("mcpsvg")
+        .getConfiguration("inkpilot")
         .get<number>("port", 7100);
 
     // Dynamic MCP context — always points at the active editor's SvgDocument
@@ -225,7 +225,7 @@ function startServer(
     });
 
     httpServer = app.listen(port, () => {
-        const msg = `mcpsvg MCP server running on http://localhost:${port}/sse`;
+        const msg = `inkpilot MCP server running on http://localhost:${port}/sse`;
         vscode.window.showInformationMessage(msg);
         console.log(msg);
     });
@@ -233,11 +233,11 @@ function startServer(
     httpServer.on("error", (err: NodeJS.ErrnoException) => {
         if (err.code === "EADDRINUSE") {
             vscode.window.showErrorMessage(
-                `Port ${port} is in use. Change mcpsvg.port in settings or stop the other process.`
+                `Port ${port} is in use. Change inkpilot.port in settings or stop the other process.`
             );
         } else {
             vscode.window.showErrorMessage(
-                `mcpsvg server error: ${err.message}`
+                `inkpilot server error: ${err.message}`
             );
         }
     });

@@ -12,9 +12,9 @@ export function registerSvgSaveProject(
         "svg_save_project",
         {
             description:
-                "Save the current SVG as a .mcpsvg project file for later reopening.",
+                "Save the current SVG as a .inkp project file for later reopening.",
             inputSchema: {
-                path: z.string().describe("Absolute path for the .mcpsvg file"),
+                path: z.string().describe("Absolute path for the .inkp file"),
                 name: z
                     .string()
                     .optional()
@@ -35,10 +35,10 @@ export function registerSvgSaveProject(
                 };
             }
 
-            // Ensure .mcpsvg extension
+            // Ensure .inkp extension
             let savePath = filePath;
-            if (!savePath.endsWith(".mcpsvg")) {
-                savePath += ".mcpsvg";
+            if (!savePath.endsWith(".inkp")) {
+                savePath += ".inkp";
             }
 
             // Ensure directory exists
@@ -48,7 +48,7 @@ export function registerSvgSaveProject(
             const projectName =
                 name || context.svgDocument.projectName || "Untitled";
             const project = {
-                mcpsvg: "0.2.0",
+                inkpilot: "0.2.0",
                 name: projectName,
                 svg,
                 artboard: { color: context.svgDocument.artboardColor },

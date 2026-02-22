@@ -1,4 +1,4 @@
-# mcpsvg — AI-Powered SVG Editor VSCode Extension
+# inkpilot — AI-Powered SVG Editor VSCode Extension
 
 ## What This Is
 A VSCode extension that exposes an MCP server for AI-powered SVG creation and editing.
