@@ -2,7 +2,7 @@
     "name": "inkpilot",
     "displayName": "inkpilot — AI-Powered SVG Editor",
     "description": "Create and edit SVGs with AI via MCP. Live canvas preview with Fabric.js, design prompts, and 13 tools for logos, icons, badges, and more.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publisher": "Redmond-Enterprises-LLC",
     "license": "MIT",
     "icon": "icon.png",

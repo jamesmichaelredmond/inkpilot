@@ -2,6 +2,11 @@
 
 All notable changes to inkpilot are documented here.
 
+## [1.0.1] - 2026-02-22
+
+### Fixed
+- Updated changelog to reflect 1.0.0 release (was showing "Unreleased")
+
 ## [1.0.0] - 2026-02-22
 
 ### Added
@@ -12,8 +17,10 @@ All notable changes to inkpilot are documented here.
 - Marketplace metadata: keywords, gallery banner, categories
 
 ### Changed
+- First stable release published to the VS Code Marketplace
 - Toolbar buttons enlarged from 32px to 36px for easier interaction
 - Updated pan/zoom controls: scroll wheel now pans by default, Ctrl+scroll or pinch to zoom
+- Optimized VSIX packaging: excluded dev files and node_modules (10.5 MB → 2.3 MB)
 
 ## [0.3.0]
 
