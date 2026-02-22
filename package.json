@@ -8,11 +8,11 @@
     "icon": "icon.png",
     "repository": {
         "type": "git",
-        "url": "https://gitlab.com/rockjimstar/mcpsvg"
+        "url": "https://github.com/jamesmichaelredmond/inkpilot"
     },
-    "homepage": "https://gitlab.com/rockjimstar/mcpsvg#readme",
+    "homepage": "https://github.com/jamesmichaelredmond/inkpilot#readme",
     "bugs": {
-        "url": "https://gitlab.com/rockjimstar/mcpsvg/-/issues"
+        "url": "https://github.com/jamesmichaelredmond/inkpilot/issues"
     },
     "engines": {
         "vscode": "^1.109.0"
