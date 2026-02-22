@@ -5,6 +5,7 @@
     "version": "0.3.0",
     "publisher": "mcpsvg",
     "license": "MIT",
+    "icon": "icon.png",
     "repository": {
         "type": "git",
         "url": "https://github.com/mcpsvg/mcpsvg"
