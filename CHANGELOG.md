@@ -2,7 +2,7 @@
 
 All notable changes to inkpilot are documented here.
 
-## [Unreleased]
+## [1.0.0] - 2026-02-22
 
 ### Added
 - Trackpad navigation: two-finger scroll to pan, pinch-to-zoom
