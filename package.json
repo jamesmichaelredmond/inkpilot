@@ -2,7 +2,7 @@
     "name": "inkpilot",
     "displayName": "inkpilot — AI-Powered SVG Editor",
     "description": "Create and edit SVGs with AI via MCP. Live preview, 5 design prompts, and 14 tools for logos, icons, badges, banners, and more.",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "publisher": "Redmond-Enterprises-LLC",
     "license": "MIT",
     "icon": "icon.png",
@@ -10,7 +10,7 @@
         "type": "git",
         "url": "https://github.com/jamesmichaelredmond/inkpilot"
     },
-    "homepage": "https://github.com/jamesmichaelredmond/inkpilot#readme",
+    "homepage": "https://inkpilot.dev",
     "bugs": {
         "url": "https://github.com/jamesmichaelredmond/inkpilot/issues"
     },

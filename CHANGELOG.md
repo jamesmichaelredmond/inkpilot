@@ -2,6 +2,15 @@
 
 All notable changes to inkpilot are documented here.
 
+## [1.0.3] - 2026-02-22
+
+### Added
+- Marketing landing page at inkpilot.dev (dark-themed, responsive)
+
+### Changed
+- Homepage in package.json now points to https://inkpilot.dev
+- Formatted entire codebase with prettier
+
 ## [1.0.2] - 2026-02-22
 
 ### Fixed
