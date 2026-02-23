@@ -71,7 +71,10 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
         if (svg) {
             setTimeout(() => {
                 webviewPanel.webview.postMessage({ type: "updateSvg", svg });
-                webviewPanel.webview.postMessage({ type: "updateArtboard", color: svgDoc.artboardColor });
+                webviewPanel.webview.postMessage({
+                    type: "updateArtboard",
+                    color: svgDoc.artboardColor,
+                });
             }, 100);
         }
 
@@ -90,7 +93,9 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
                         );
                         break;
                     case "saveAs":
-                        vscode.commands.executeCommand("inkpilot.saveProjectAs");
+                        vscode.commands.executeCommand(
+                            "inkpilot.saveProjectAs"
+                        );
                         break;
                     case "export":
                         vscode.commands.executeCommand("inkpilot.exportSvg");
@@ -181,7 +186,9 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
     updatePanelTitle(): void {
         if (!this.manualPanel) return;
         if (this.manualSvgDoc.projectPath) {
-            this.manualPanel.title = path.basename(this.manualSvgDoc.projectPath);
+            this.manualPanel.title = path.basename(
+                this.manualSvgDoc.projectPath
+            );
         } else {
             this.manualPanel.title = "inkpilot Editor";
         }
@@ -237,7 +244,9 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
                         vscode.commands.executeCommand("inkpilot.saveProject");
                         break;
                     case "saveAs":
-                        vscode.commands.executeCommand("inkpilot.saveProjectAs");
+                        vscode.commands.executeCommand(
+                            "inkpilot.saveProjectAs"
+                        );
                         break;
                     case "export":
                         vscode.commands.executeCommand("inkpilot.exportSvg");
@@ -297,7 +306,10 @@ export class SvgEditorProvider implements vscode.CustomTextEditorProvider {
             if (instance) {
                 const svg = instance.svgDoc.getSvg();
                 instance.panel.webview.postMessage({ type: "updateSvg", svg });
-                instance.panel.webview.postMessage({ type: "updateArtboard", color: instance.svgDoc.artboardColor });
+                instance.panel.webview.postMessage({
+                    type: "updateArtboard",
+                    color: instance.svgDoc.artboardColor,
+                });
                 this.applyEditToDocument(instance);
                 return;
             }

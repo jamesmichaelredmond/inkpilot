@@ -23,7 +23,11 @@ function registerWithClaudeCode(port: number) {
             type: "sse",
             url: `http://localhost:${port}/sse`,
         };
-        fs.writeFileSync(CLAUDE_CONFIG, JSON.stringify(config, null, 2), "utf-8");
+        fs.writeFileSync(
+            CLAUDE_CONFIG,
+            JSON.stringify(config, null, 2),
+            "utf-8"
+        );
     } catch {
         // Claude Code not installed or config unreadable — skip silently
     }
@@ -36,7 +40,11 @@ function unregisterFromClaudeCode() {
         const config = JSON.parse(raw);
         if (config.mcpServers?.inkpilot) {
             delete config.mcpServers.inkpilot;
-            fs.writeFileSync(CLAUDE_CONFIG, JSON.stringify(config, null, 2), "utf-8");
+            fs.writeFileSync(
+                CLAUDE_CONFIG,
+                JSON.stringify(config, null, 2),
+                "utf-8"
+            );
         }
     } catch {
         // Best-effort cleanup

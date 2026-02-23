@@ -8,7 +8,8 @@ export function registerSvgListElements(
     server.registerTool(
         "svg_list_elements",
         {
-            description: "List all elements in the current SVG with their IDs, tag names, and key attributes.",
+            description:
+                "List all elements in the current SVG with their IDs, tag names, and key attributes.",
         },
         async () => {
             const elements = context.svgDocument.listElements();

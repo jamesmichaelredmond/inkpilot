@@ -285,7 +285,8 @@ export function validateSvg(svgMarkup: string): ValidationIssue[] {
     // 14. Check for textPath on a full-circle path (causes overlapping text)
     if (defs) {
         for (const tp of textPaths) {
-            const href = tp.getAttribute("href") || tp.getAttribute("xlink:href");
+            const href =
+                tp.getAttribute("href") || tp.getAttribute("xlink:href");
             if (!href) continue;
             const pathId = href.replace(/^#/, "");
             const pathEl = defs.querySelector(`#${pathId}`);

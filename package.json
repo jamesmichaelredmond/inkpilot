@@ -120,7 +120,9 @@
         "languages": [
             {
                 "id": "inkpilot",
-                "extensions": [".inkp"],
+                "extensions": [
+                    ".inkp"
+                ],
                 "icon": {
                     "light": "./icons/inkp-file-light.svg",
                     "dark": "./icons/inkp-file-dark.svg"

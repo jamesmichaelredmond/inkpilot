@@ -30,12 +30,8 @@ export function registerDesignGraphicPrompt(server: McpServer) {
             },
         },
         async ({ description, style, colors }) => {
-            const styleCtx = style
-                ? `\nRequested aesthetic: ${style}`
-                : "";
-            const colorCtx = colors
-                ? `\nColor preference: ${colors}`
-                : "";
+            const styleCtx = style ? `\nRequested aesthetic: ${style}` : "";
+            const colorCtx = colors ? `\nColor preference: ${colors}` : "";
 
             return {
                 description: `Design a distinctive SVG graphic: ${description}`,

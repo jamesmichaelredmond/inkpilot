@@ -15,10 +15,7 @@ export function registerSvgSaveProject(
                 "Save the current SVG as a .inkp project file for later reopening.",
             inputSchema: {
                 path: z.string().describe("Absolute path for the .inkp file"),
-                name: z
-                    .string()
-                    .optional()
-                    .describe("Project name"),
+                name: z.string().optional().describe("Project name"),
             },
         },
         async ({ path: filePath, name }) => {

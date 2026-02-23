@@ -56,7 +56,11 @@ export function createMcpApp(context: McpServerContext) {
     // Internal IPC endpoint: stdio server POSTs SVG here to sync with the webview
     app.use("/internal/sync", express.json({ limit: "10mb" }));
     app.post("/internal/sync", (req, res) => {
-        const { svg, action, artboardColor } = req.body as { svg?: string; action?: string; artboardColor?: string };
+        const { svg, action, artboardColor } = req.body as {
+            svg?: string;
+            action?: string;
+            artboardColor?: string;
+        };
         if (action === "open") {
             context.openEditor();
         }

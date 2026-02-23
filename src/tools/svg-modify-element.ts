@@ -12,9 +12,11 @@ export function registerSvgModifyElement(
             description:
                 "Add, update, or remove a single SVG element. For multi-element changes, prefer svg_set with full markup.",
             inputSchema: {
-                action: z.enum(["add", "update", "remove"]).describe(
-                    "add: insert new element, update: change attributes by ID, remove: delete by ID"
-                ),
+                action: z
+                    .enum(["add", "update", "remove"])
+                    .describe(
+                        "add: insert new element, update: change attributes by ID, remove: delete by ID"
+                    ),
                 tag: z
                     .string()
                     .optional()

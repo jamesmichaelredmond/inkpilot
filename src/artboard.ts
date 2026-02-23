@@ -63,7 +63,12 @@ export function detectArtboardColor(svgMarkup: string): string {
         const raw = match[1].trim().toLowerCase();
 
         // Skip non-color values
-        if (raw === "none" || raw === "transparent" || raw.startsWith("url(") || raw === "currentcolor") {
+        if (
+            raw === "none" ||
+            raw === "transparent" ||
+            raw.startsWith("url(") ||
+            raw === "currentcolor"
+        ) {
             continue;
         }
 

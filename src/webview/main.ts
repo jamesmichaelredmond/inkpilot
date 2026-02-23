@@ -66,28 +66,35 @@ function init() {
     resizeObserver.observe(container);
 
     // --- Pan & Zoom (trackpad two-finger scroll / pinch, or mouse wheel) ---
-    container.addEventListener("wheel", (e) => {
-        e.preventDefault();
+    container.addEventListener(
+        "wheel",
+        (e) => {
+            e.preventDefault();
 
-        if (e.ctrlKey) {
-            // Pinch-to-zoom (trackpad) or Ctrl+scroll (mouse)
-            const delta = e.deltaY;
-            const newZoom = Math.min(Math.max(zoom * 0.99 ** delta, 0.1), 20);
+            if (e.ctrlKey) {
+                // Pinch-to-zoom (trackpad) or Ctrl+scroll (mouse)
+                const delta = e.deltaY;
+                const newZoom = Math.min(
+                    Math.max(zoom * 0.99 ** delta, 0.1),
+                    20
+                );
 
-            const rect = container.getBoundingClientRect();
-            const cursorX = e.clientX - rect.left;
-            const cursorY = e.clientY - rect.top;
-            panX = cursorX - (cursorX - panX) * (newZoom / zoom);
-            panY = cursorY - (cursorY - panY) * (newZoom / zoom);
-            zoom = newZoom;
-        } else {
-            // Two-finger scroll (trackpad) or plain scroll wheel → pan
-            panX -= e.deltaX;
-            panY -= e.deltaY;
-        }
+                const rect = container.getBoundingClientRect();
+                const cursorX = e.clientX - rect.left;
+                const cursorY = e.clientY - rect.top;
+                panX = cursorX - (cursorX - panX) * (newZoom / zoom);
+                panY = cursorY - (cursorY - panY) * (newZoom / zoom);
+                zoom = newZoom;
+            } else {
+                // Two-finger scroll (trackpad) or plain scroll wheel → pan
+                panX -= e.deltaX;
+                panY -= e.deltaY;
+            }
 
-        applyTransform();
-    }, { passive: false });
+            applyTransform();
+        },
+        { passive: false }
+    );
 
     // --- Pan (Space+drag or middle-mouse-drag) ---
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -116,10 +123,7 @@ function init() {
     container.addEventListener("mousedown", (e) => {
         container.focus();
         // Pan with: middle mouse, Space+left click, or Alt+left click
-        if (
-            e.button === 1 ||
-            ((spaceHeld || e.altKey) && e.button === 0)
-        ) {
+        if (e.button === 1 || ((spaceHeld || e.altKey) && e.button === 0)) {
             isPanning = true;
             lastPanX = e.clientX;
             lastPanY = e.clientY;

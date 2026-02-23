@@ -45,7 +45,11 @@ svgDocument.on("change", (svg: string) => {
 const context: McpServerContext = {
     svgDocument,
     notifyWebview: () => {
-        syncToExtension(svgDocument.getSvg(), undefined, svgDocument.artboardColor);
+        syncToExtension(
+            svgDocument.getSvg(),
+            undefined,
+            svgDocument.artboardColor
+        );
     },
     openEditor: () => {
         syncToExtension("", "open");

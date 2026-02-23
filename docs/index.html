@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>inkpilot — AI-Powered SVG Editor for VS Code</title>
+        <meta
+            name="description"
+            content="Tell your AI what to design. Watch it build logos, icons, badges, and banners live in VS Code. Iterate by conversation, not by hand."
+        />
+        <meta
+            property="og:title"
+            content="inkpilot — AI-Powered SVG Editor for VS Code"
+        />
+        <meta
+            property="og:description"
+            content="Tell your AI what to design. Watch it build logos, icons, badges, and banners live in VS Code."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://inkpilot.dev" />
+        <link rel="icon" type="image/svg+xml" href="icon.svg" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <!-- Navbar -->
+        <header class="navbar">
+            <div class="container navbar-inner">
+                <a href="/" class="logo">
+                    <img
+                        class="logo-icon"
+                        src="icon.svg"
+                        alt="inkpilot"
+                        width="32"
+                        height="32"
+                    />
+                    <span>inkpilot</span>
+                </a>
+                <nav class="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="#get-started">Get Started</a>
+                </nav>
+                <div class="nav-right">
+                    <a
+                        href="https://github.com/jamesmichaelredmond/inkpilot"
+                        class="nav-github"
+                        aria-label="GitHub"
+                    >
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 16 16"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+                            />
+                        </svg>
+                        <span>GitHub</span>
+                    </a>
+                </div>
+                <button class="mobile-menu-btn" aria-label="Toggle menu">
+                    <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                    >
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-center">
+                    <div class="hero-badge">
+                        <span class="badge-dot"></span>
+                        VS Code Extension &middot; Free &amp; Open Source
+                    </div>
+                    <h1>Design SVGs with AI.<br />Live in your editor.</h1>
+                    <p class="hero-sub">
+                        Describe what you want. Watch it build. Iterate by
+                        conversation, not by hand.
+                    </p>
+                    <div class="hero-ctas">
+                        <a
+                            href="https://marketplace.visualstudio.com/items?itemName=Redmond-Enterprises-LLC.inkpilot"
+                            class="btn btn-primary"
+                            >Install Free</a
+                        >
+                        <a
+                            href="https://github.com/jamesmichaelredmond/inkpilot"
+                            class="btn btn-ghost"
+                            >View on GitHub</a
+                        >
+                    </div>
+                </div>
+
+                <!-- VS Code Mockup -->
+                <div class="mockup-wrapper">
+                    <div class="mockup">
+                        <div class="mockup-sidebar">
+                            <div class="mockup-sidebar-icon active"></div>
+                            <div class="mockup-sidebar-icon"></div>
+                            <div class="mockup-sidebar-icon"></div>
+                            <div class="mockup-sidebar-icon"></div>
+                        </div>
+                        <div class="mockup-main">
+                            <div class="mockup-panel mockup-chat">
+                                <div class="mockup-tab">
+                                    <span class="mockup-tab-dot"></span>
+                                    <span>Chat</span>
+                                </div>
+                                <div class="mockup-chat-body">
+                                    <div class="mockup-msg mockup-msg-user">
+                                        <div class="mockup-msg-avatar">You</div>
+                                        <p>
+                                            Design the inkpilot logo — blue
+                                            rounded square with a white bezier
+                                            curve and anchor points
+                                        </p>
+                                    </div>
+                                    <div class="mockup-msg mockup-msg-ai">
+                                        <div class="mockup-msg-avatar">AI</div>
+                                        <p>
+                                            I'll create that logo now. Starting
+                                            with the rounded background...
+                                        </p>
+                                    </div>
+                                    <div class="mockup-msg mockup-msg-ai">
+                                        <div class="mockup-msg-avatar">AI</div>
+                                        <p class="mockup-tool-call">
+                                            <span class="tool-tag"
+                                                >svg_create</span
+                                            >
+                                            Building SVG structure...
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mockup-panel mockup-canvas">
+                                <div class="mockup-tab">
+                                    <span class="mockup-tab-dot blue"></span>
+                                    <span>inkpilot Editor</span>
+                                </div>
+                                <div class="mockup-canvas-body">
+                                    <div class="mockup-canvas-art">
+                                        <img
+                                            src="icon.svg"
+                                            alt="inkpilot logo"
+                                            width="120"
+                                            height="120"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Social Proof Bar -->
+        <section class="proof-bar">
+            <div class="container">
+                <span class="proof-label">Works with any MCP client</span>
+                <div class="proof-logos">
+                    <div class="proof-item">
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 0 1 6.93 4H5.07A8 8 0 0 1 12 4zm0 16a8 8 0 0 1-6.93-4h13.86A8 8 0 0 1 12 20z"
+                            />
+                        </svg>
+                        <span>Claude Code</span>
+                    </div>
+                    <div class="proof-item">
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
+                            />
+                        </svg>
+                        <span>GitHub Copilot</span>
+                    </div>
+                    <div class="proof-item">
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        >
+                            <path
+                                d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                            />
+                            <path
+                                d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                            />
+                        </svg>
+                        <span>Any MCP Client</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="how-it-works" id="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">How it works</span>
+                    <h2>From prompt to SVG in seconds.</h2>
+                    <p class="section-sub">
+                        No design skills. No blank canvas anxiety. Just describe
+                        what you need.
+                    </p>
+                </div>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-visual">
+                            <div class="step-bubble">
+                                <p>
+                                    Design the inkpilot logo — blue square
+                                    with a white bezier curve
+                                </p>
+                            </div>
+                            <div class="step-cursor">Send to AI &rarr;</div>
+                        </div>
+                        <span class="step-num">01</span>
+                        <h3>Describe</h3>
+                        <p>
+                            Type a prompt like you'd brief a designer. The AI
+                            understands context, style, and intent.
+                        </p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-visual">
+                            <div class="step-preview">
+                                <img
+                                    src="icon.svg"
+                                    alt="inkpilot logo"
+                                    width="60"
+                                    height="60"
+                                />
+                            </div>
+                            <div class="step-progress">
+                                <span class="progress-dot filled"></span>
+                                <span class="progress-dot filled"></span>
+                                <span class="progress-dot"></span>
+                            </div>
+                            <span class="step-status"
+                                >Building SVG... tool 7 of 14</span
+                            >
+                        </div>
+                        <span class="step-num">02</span>
+                        <h3>Watch it build</h3>
+                        <p>
+                            The AI calls SVG tools in real time. Your canvas
+                            updates live as each element gets placed.
+                        </p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-visual">
+                            <div class="step-file">
+                                <span class="file-ext">.svg</span>
+                                <span class="file-name">badge.svg</span>
+                            </div>
+                        </div>
+                        <span class="step-num">03</span>
+                        <h3>Export</h3>
+                        <p>
+                            Clean SVG saved directly to your project.
+                            Vector-perfect, production-ready, no cleanup needed.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="features" id="features">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Features</span>
+                    <h2>The full toolkit. No compromises.</h2>
+                </div>
+
+                <!-- Feature 1: Tools -->
+                <div class="feature-row">
+                    <div class="feature-text">
+                        <span class="feature-chip">14 tools, one canvas</span>
+                        <h3>Your AI has a<br />complete SVG toolkit.</h3>
+                        <p>
+                            Create, modify, inspect, validate, screenshot,
+                            export. The AI orchestrates all 14 tools
+                            automatically. You just describe what you want.
+                        </p>
+                    </div>
+                    <div class="feature-visual">
+                        <span class="visual-label">// available tools</span>
+                        <div class="tools-list">
+                            <div class="tool-row">
+                                <span class="tool-pill"
+                                    ><span class="tool-dot"></span
+                                    >svg_create</span
+                                >
+                                <span class="tool-pill"
+                                    ><span class="tool-dot"></span>svg_set</span
+                                >
+                            </div>
+                            <div class="tool-row">
+                                <span class="tool-pill"
+                                    ><span class="tool-dot"></span>svg_get</span
+                                >
+                                <span class="tool-pill"
+                                    ><span class="tool-dot"></span
+                                    >svg_validate_and_screenshot</span
+                                >
+                            </div>
+                            <div class="tool-row">
+                                <span class="tool-pill"
+                                    ><span class="tool-dot"></span
+                                    >svg_export</span
+                                >
+                                <span class="tool-pill"
+                                    ><span class="tool-dot"></span
+                                    >svg_modify_element</span
+                                >
+                            </div>
+                            <div class="tool-row">
+                                <span class="tool-pill"
+                                    ><span class="tool-dot"></span
+                                    >svg_list_elements</span
+                                >
+                                <span class="tool-pill highlight"
+                                    ><span class="tool-dot"></span>+ 7 more
+                                    tools</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 2: Prompts -->
+                <div class="feature-row reverse">
+                    <div class="feature-text">
+                        <span class="feature-chip"
+                            >Design prompts, not blank canvases</span
+                        >
+                        <h3>
+                            5 built-in prompts,<br />engineer-quality results.
+                        </h3>
+                        <p>
+                            Logo, icon, badge, banner, graphic &mdash; each
+                            prompt bundles a structured design process with
+                            quality constraints. The AI knows how to think about
+                            design, not just generate shapes.
+                        </p>
+                    </div>
+                    <div class="feature-visual">
+                        <span class="visual-label">// prompt templates</span>
+                        <div class="prompt-list">
+                            <div class="prompt-item active">
+                                <div class="prompt-icon blue"></div>
+                                <div class="prompt-info">
+                                    <strong>design-logo</strong>
+                                    <span
+                                        >Professional logo with mark &amp;
+                                        wordmark</span
+                                    >
+                                </div>
+                            </div>
+                            <div class="prompt-item">
+                                <div class="prompt-icon"></div>
+                                <div class="prompt-info">
+                                    <strong>design-icon</strong>
+                                    <span
+                                        >App icons, UI icons, system icons</span
+                                    >
+                                </div>
+                            </div>
+                            <div class="prompt-item">
+                                <div class="prompt-icon"></div>
+                                <div class="prompt-info">
+                                    <strong
+                                        >design-badge &middot; design-banner
+                                        &middot; design-graphic</strong
+                                    >
+                                    <span
+                                        >Badges, banners, and general
+                                        graphics</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 3: Self-review -->
+                <div class="feature-row">
+                    <div class="feature-text">
+                        <span class="feature-chip">See what the AI sees</span>
+                        <h3>The AI can see,<br />reflect, and self-correct.</h3>
+                        <p>
+                            inkpilot lets the AI screenshot its own work,
+                            validate SVG structure, and inspect individual
+                            elements. It works like a real designer &mdash;
+                            build, review, refine.
+                        </p>
+                    </div>
+                    <div class="feature-visual">
+                        <span class="visual-label">// self-review loop</span>
+                        <div class="loop-row">
+                            <div class="loop-step">
+                                <div class="loop-icon">
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="#7090e0"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                    >
+                                        <polygon
+                                            points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"
+                                        />
+                                    </svg>
+                                </div>
+                                <span>Generate</span>
+                            </div>
+                            <span class="loop-arrow">&rarr;</span>
+                            <div class="loop-step">
+                                <div class="loop-icon">
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="#7090e0"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="3"
+                                            width="18"
+                                            height="18"
+                                            rx="2"
+                                        />
+                                        <circle cx="8.5" cy="8.5" r="1.5" />
+                                        <polyline points="21 15 16 10 5 21" />
+                                    </svg>
+                                </div>
+                                <span>Screenshot</span>
+                            </div>
+                            <span class="loop-arrow">&rarr;</span>
+                            <div class="loop-step active">
+                                <div class="loop-icon">
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="#60b0ff"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                    >
+                                        <path d="M12 20h9" />
+                                        <path
+                                            d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"
+                                        />
+                                    </svg>
+                                </div>
+                                <span>Refine</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Open Source -->
+        <section class="open-source">
+            <div class="container">
+                <div class="oss-icon">MIT</div>
+                <h2>Free. Open source.<br />No account needed.</h2>
+                <p class="oss-desc">
+                    inkpilot is MIT licensed. Install it, connect your AI, start
+                    designing. That's it.
+                </p>
+                <div class="oss-badges">
+                    <span class="oss-badge">
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 16 16"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+                            />
+                        </svg>
+                        Open Source
+                    </span>
+                    <span class="oss-badge">
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        >
+                            <path
+                                d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                            />
+                        </svg>
+                        MIT License
+                    </span>
+                    <span class="oss-badge">
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        >
+                            <rect
+                                x="3"
+                                y="11"
+                                width="18"
+                                height="11"
+                                rx="2"
+                                ry="2"
+                            />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        No Account Required
+                    </span>
+                </div>
+                <a
+                    href="https://marketplace.visualstudio.com/items?itemName=Redmond-Enterprises-LLC.inkpilot"
+                    class="btn btn-primary btn-lg"
+                    >Install from Marketplace</a
+                >
+            </div>
+        </section>
+
+        <!-- Quick Start -->
+        <section class="quick-start" id="get-started">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Quick start</span>
+                    <h2>Up and running in under 2 minutes.</h2>
+                </div>
+                <div class="qs-steps">
+                    <div class="qs-step">
+                        <div class="qs-num">1</div>
+                        <div class="qs-content">
+                            <h3>Install the extension</h3>
+                            <p>
+                                Search for "inkpilot" in VS Code Extensions, or
+                                run:
+                            </p>
+                            <div class="qs-code">
+                                <code
+                                    >code --install-extension
+                                    Redmond-Enterprises-LLC.inkpilot</code
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="qs-step">
+                        <div class="qs-num">2</div>
+                        <div class="qs-content">
+                            <h3>Connect your MCP client</h3>
+                            <p>
+                                Claude Code and GitHub Copilot auto-register.
+                                Others connect via SSE:
+                            </p>
+                            <div class="qs-code">
+                                <code>http://localhost:7100/sse</code>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="qs-step">
+                        <div class="qs-num">3</div>
+                        <div class="qs-content">
+                            <h3>Start designing</h3>
+                            <p>
+                                Open the command palette, run
+                                <strong>inkpilot: Open SVG Editor</strong>, then
+                                ask your AI to design something.
+                            </p>
+                            <div class="qs-code">
+                                <code>&gt; inkpilot: Open SVG Editor</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-brand">
+                        <div class="footer-logo">
+                            <img
+                                class="logo-icon small"
+                                src="icon.svg"
+                                alt="inkpilot"
+                                width="24"
+                                height="24"
+                            />
+                            <span>inkpilot</span>
+                        </div>
+                        <p>AI-powered SVG editor.<br />Live in VS Code.</p>
+                    </div>
+                    <div class="footer-links">
+                        <div class="footer-col">
+                            <h4>Product</h4>
+                            <a
+                                href="https://marketplace.visualstudio.com/items?itemName=Redmond-Enterprises-LLC.inkpilot"
+                                >VS Code Marketplace</a
+                            >
+                            <a
+                                href="https://github.com/jamesmichaelredmond/inkpilot"
+                                >GitHub</a
+                            >
+                            <a
+                                href="https://github.com/jamesmichaelredmond/inkpilot/issues"
+                                >Issues</a
+                            >
+                            <a
+                                href="https://github.com/jamesmichaelredmond/inkpilot/blob/main/LICENSE"
+                                >MIT License</a
+                            >
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-divider"></div>
+                <div class="footer-bottom">
+                    <span
+                        >&copy; 2025 inkpilot &middot; MIT License &middot;
+                        <a href="https://inkpilot.dev">inkpilot.dev</a></span
+                    >
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // Mobile menu toggle
+            const menuBtn = document.querySelector(".mobile-menu-btn");
+            const navLinks = document.querySelector(".nav-links");
+            if (menuBtn) {
+                menuBtn.addEventListener("click", () => {
+                    navLinks.classList.toggle("open");
+                    menuBtn.classList.toggle("open");
+                });
+            }
+            // Close menu on link click
+            document.querySelectorAll(".nav-links a").forEach((a) => {
+                a.addEventListener("click", () => {
+                    navLinks.classList.remove("open");
+                    menuBtn.classList.remove("open");
+                });
+            });
+        </script>
+    </body>
+</html>

@@ -5,7 +5,8 @@ export function registerSvgGet(server: McpServer, context: McpServerContext) {
     server.registerTool(
         "svg_get",
         {
-            description: "Return the current SVG source markup. Includes any visual edits made by the user in the editor. Useful for reviewing the current state before making modifications with svg_set.",
+            description:
+                "Return the current SVG source markup. Includes any visual edits made by the user in the editor. Useful for reviewing the current state before making modifications with svg_set.",
         },
         async () => {
             const svg = context.svgDocument.getSvg();

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs />
+
+  <!-- Background -->
+  <g id="background">
+    <rect id="bg-rect" x="0" y="0" width="128" height="128" rx="20" fill="#2563eb" />
+  </g>
+
+  <!-- Bezier S-curve — Illustrator selected-path style -->
+  <g id="bezier-group">
+
+    <!-- Handle lines (anchor → control point) -->
+    <line id="handle-line-1" x1="28" y1="96" x2="88" y2="96" stroke="#ffffff" stroke-width="2" opacity="0.5" stroke-linecap="round" />
+    <line id="handle-line-2" x1="100" y1="32" x2="40" y2="32" stroke="#ffffff" stroke-width="2" opacity="0.5" stroke-linecap="round" />
+
+    <!-- Thick white S-curve stroke (the "path art") -->
+    <path id="s-curve" d="M 28,96 C 88,96 40,32 100,32" stroke="#ffffff" stroke-width="7" stroke-linecap="round" fill="none" />
+
+    <!-- Thin path outline on top — the selection highlight like in Illustrator -->
+    <path id="s-curve-outline" d="M 28,96 C 88,96 40,32 100,32" stroke="#2563eb" stroke-width="2" stroke-linecap="round" fill="none" opacity="1" />
+
+    <!-- Anchor points (outlined circles — like Illustrator's anchor display) -->
+    <circle id="anchor-1" cx="28" cy="96" r="5" fill="#2563eb" stroke="#ffffff" stroke-width="2.5" />
+    <circle id="anchor-2" cx="100" cy="32" r="5" fill="#2563eb" stroke="#ffffff" stroke-width="2.5" />
+
+    <!-- Control handle points (smaller outlined circles) -->
+    <circle id="handle-1" cx="88" cy="96" r="3.5" fill="#2563eb" stroke="#ffffff" stroke-width="2" />
+    <circle id="handle-2" cx="40" cy="32" r="3.5" fill="#2563eb" stroke="#ffffff" stroke-width="2" />
+  </g>
+</svg>

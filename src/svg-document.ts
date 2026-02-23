@@ -176,9 +176,15 @@ export class SvgDocument extends EventEmitter {
     }
 
     /** Parse .inkp project JSON and load the SVG. Returns the project name and artboard color. */
-    static fromProjectJson(json: string): { svg: string; name: string; artboardColor: string } | null {
+    static fromProjectJson(
+        json: string
+    ): { svg: string; name: string; artboardColor: string } | null {
         try {
-            const project = JSON.parse(json) as { name?: string; svg?: string; artboard?: { color?: string } };
+            const project = JSON.parse(json) as {
+                name?: string;
+                svg?: string;
+                artboard?: { color?: string };
+            };
             if (!project.svg) return null;
             return {
                 svg: project.svg,

@@ -11,8 +11,7 @@ export function registerSvgExport(
     server.registerTool(
         "svg_export",
         {
-            description:
-                "Export the current SVG as a standalone .svg file.",
+            description: "Export the current SVG as a standalone .svg file.",
             inputSchema: {
                 path: z.string().describe("Absolute path for the .svg file"),
             },
